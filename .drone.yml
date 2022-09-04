@@ -1,0 +1,45 @@
+---
+kind: pipeline
+type: kubernetes
+name: build-bitwarden-crd-operator
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: build-bitwarden-crd-operator
+    image: plugins/kaniko
+    settings:
+      dockerfile: Dockerfile
+      password:
+        from_secret: docker_password
+      username:
+        from_secret: docker_username
+      repo: lerentis/bitwarden-crd-operator
+      tags: 
+        - ${DRONE_COMMIT_SHA}
+        - latest
+    when:
+      event:
+      - push
+      - pull_request
+      - cron
+    resources:
+      limits:
+        cpu: 200
+        memory: 1024MiB
+  - name: trivy
+    image: aquasec/trivy:0.31.3
+    commands:
+      - trivy lerentis/bitwarden-crd-operator:${DRONE_COMMIT_SHA}
+    environment:
+      TRIVY_USERNAME:
+        from_secret: docker_username
+      TRIVY_PASSWORD:
+        from_secret: docker_password
+    when:
+      event:
+      - push
+      - pull_request
+      - cron

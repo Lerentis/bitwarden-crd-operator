@@ -1,0 +1,27 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: bitwarden-secret.lerentis.uploadfilter24.eu
+spec:
+  scope: Namespaced
+  group: lerentis.uploadfilter24.eu
+  names:
+    kind: BitwardenSecret
+    plural: BitwardenSecrets
+    singular: BitwardenSecret
+    shortNames:
+      - bws
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
