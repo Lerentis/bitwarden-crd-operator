@@ -20,11 +20,14 @@ RUN set -eux; \
     chmod +x /usr/local/bin/bw; \
     apt-get update; \
     apt-get install -y --no-install-recommends python3 python3-pip; \
-    pip install -r requirements.txt
+    apt-get clean;
 
 COPY --chown=bw-operator:bw-operator bitwarden-crd-operator.py /home/bw-operator/bitwarden-crd-operator.py
 
 USER bw-operator
+
+RUN set -eux; \
+    pip install -r requirements.txt
 
 ENTRYPOINT [ "/home/bw-operator/bitwarden-crd-operator.py" ]
 CMD [ "--help" ]
