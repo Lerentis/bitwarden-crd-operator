@@ -22,9 +22,9 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends python3 python3-pip; \
     pip install -r requirements.txt
 
-COPY --chown=bw-operator:bw-operator operator.py /home/bw-operator/operator.py
+COPY --chown=bw-operator:bw-operator bitwarden-crd-operator.py /home/bw-operator/bitwarden-crd-operator.py
 
 USER bw-operator
 
-ENTRYPOINT [ "/home/bw-operator/operator.py" ]
+ENTRYPOINT [ "/home/bw-operator/bitwarden-crd-operator.py" ]
 CMD [ "--help" ]
