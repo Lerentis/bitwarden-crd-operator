@@ -29,5 +29,5 @@ USER bw-operator
 RUN set -eux; \
     pip install -r requirements.txt
 
-ENTRYPOINT [ "/home/bw-operator/bitwarden-crd-operator.py" ]
-CMD [ "--help" ]
+ENTRYPOINT [ "/home/bw-operator/.local/bin/kopf", "run" ]
+CMD [ "/home/bw-operator/bitwarden-crd-operator.py" ]
