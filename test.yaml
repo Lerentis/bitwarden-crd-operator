@@ -1,0 +1,8 @@
+---
+apiVersion: "lerentis.uploadfilter24.eu/v1"
+kind: BitwardenSecret
+metadata:
+  name: test
+spec:
+  type: "password"
+  id: "123456"
