@@ -6,9 +6,9 @@ replicaCount: 1
 
 image:
   repository: lerentis/bitwarden-crd-operator
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "68ba68fb46c48c61e484de7ea5c19d1f14dec915"
 
 imagePullSecrets: []
 nameOverride: ""

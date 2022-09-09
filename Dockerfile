@@ -29,5 +29,5 @@ USER bw-operator
 RUN set -eux; \
     pip install -r requirements.txt
 
-ENTRYPOINT [ "/home/bw-operator/.local/bin/kopf", "run" ]
+ENTRYPOINT [ "/home/bw-operator/.local/bin/kopf", "run", "--liveness=http://0.0.0.0:8080/healthz" ]
 CMD [ "/home/bw-operator/bitwarden-crd-operator.py" ]
