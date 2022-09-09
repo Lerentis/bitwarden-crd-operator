@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "bitwarden-crd-operator.serviceAccountName" . }}-binding
+subjects:
+- kind: ServiceAccount
+  name: {{ include "bitwarden-crd-operator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "bitwarden-crd-operator.serviceAccountName" . }}-role
+  apiGroup: rbac.authorization.k8s.io

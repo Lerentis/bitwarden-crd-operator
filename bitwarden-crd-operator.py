@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import kopf
 
-@kopf.on.create('bitwarden-secret')
+@kopf.on.create('bitwarden-secrets.lerentis.uploadfilter24')
 def create_fn(body, **kwargs):
 
     # The all-purpose function for the event creation.
