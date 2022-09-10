@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import kopf
 import kubernetes
 from jinja2 import Template
@@ -15,7 +14,8 @@ def create_fn(spec, name, namespace, logger, **kwargs):
 
     api = kubernetes.client.CoreV1Api()
 
-    with open(os.path.join(os.path.dirname(__file__), '/templates/username-password.yaml.j2')) as file_:
+    # TODO: this should better be a os lookup
+    with open('/home/bw-operator/templates/username-password.yaml.j2') as file_:
         template = Template(file_.read())
 
     data = template.render(
