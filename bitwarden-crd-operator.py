@@ -23,8 +23,8 @@ def create_fn(spec, name, namespace, logger, **kwargs):
         original_crd=name,
         secret_name=secret_name,
         namespace=secret_namespace,
-        username=base64.b64encode("test"),
-        password=base64.b64encode("test")
+        username=str(base64.b64encode("test".encode("utf-8")), "utf-8"),
+        password=str(base64.b64encode("test".encode("utf-8")), "utf-8")
     )
 
     obj = api.create_namespaced_secret(
