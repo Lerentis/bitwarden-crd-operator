@@ -8,7 +8,7 @@ image:
   repository: lerentis/bitwarden-crd-operator
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2685c5b97d76bf00ed4c15519b699ae88682078f"
+  tag: "97fced6969e32d0c7e0975865f26ebbc43f1cd8a"
 
 imagePullSecrets: []
 nameOverride: ""

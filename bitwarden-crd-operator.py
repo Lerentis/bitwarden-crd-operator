@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import kopf
 import kubernetes
+import base64
 from jinja2 import Template
 
 
@@ -22,8 +23,8 @@ def create_fn(spec, name, namespace, logger, **kwargs):
         original_crd=name,
         secret_name=secret_name,
         namespace=secret_namespace,
-        username="test",
-        password="test"
+        username=base64.b64encode("test"),
+        password=base64.b64encode("test")
     )
 
     obj = api.create_namespaced_secret(
