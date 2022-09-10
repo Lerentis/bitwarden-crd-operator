@@ -2,7 +2,7 @@
 import os
 import kopf
 import kubernetes
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Template
 
 
 @kopf.on.create('bitwarden-secrets.lerentis.uploadfilter24.eu')
@@ -15,9 +15,9 @@ def create_fn(spec, name, namespace, logger, **kwargs):
 
     api = kubernetes.client.CoreV1Api()
 
-    environment = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), '/templates')))
+    with open(os.path.join(os.path.dirname(__file__), '/templates/username-password.yaml.j2')) as file_:
+        template = Template(file_.read())
 
-    template = environment.get_template('username-password.yaml.j2')
     data = template.render(
         original_crd=name,
         secret_name=secret_name,
