@@ -1,1 +1,3 @@
 kopf
+kubernetes
+jinja2

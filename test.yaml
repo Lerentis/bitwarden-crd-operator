@@ -6,3 +6,5 @@ metadata:
 spec:
   type: "password"
   id: "123456"
+  name: "test-secret"
+  namespace: "default"

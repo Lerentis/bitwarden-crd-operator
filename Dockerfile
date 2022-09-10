@@ -23,11 +23,12 @@ RUN set -eux; \
     apt-get clean;
 
 COPY --chown=bw-operator:bw-operator bitwarden-crd-operator.py /home/bw-operator/bitwarden-crd-operator.py
+COPY --chown=bw-operator:bw-operator templates /home/bw-operator/templates
 
 USER bw-operator
 
 RUN set -eux; \
     pip install -r requirements.txt
 
-ENTRYPOINT [ "/home/bw-operator/.local/bin/kopf", "run", "--liveness=http://0.0.0.0:8080/healthz" ]
+ENTRYPOINT [ "/home/bw-operator/.local/bin/kopf", "run", "--all-namespaces", "--liveness=http://0.0.0.0:8080/healthz" ]
 CMD [ "/home/bw-operator/bitwarden-crd-operator.py" ]
