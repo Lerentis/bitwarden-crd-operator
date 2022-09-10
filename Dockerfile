@@ -23,7 +23,6 @@ RUN set -eux; \
     apt-get clean;
 
 COPY --chown=bw-operator:bw-operator bitwarden-crd-operator.py /home/bw-operator/bitwarden-crd-operator.py
-COPY --chown=bw-operator:bw-operator templates /home/bw-operator/templates
 
 USER bw-operator
 

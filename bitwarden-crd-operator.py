@@ -2,8 +2,17 @@
 import kopf
 import kubernetes
 import base64
-from jinja2 import Template
+import os
 
+def get_secret_from_bitwarden(type, id):
+    pass
+
+@kopf.on.startup()
+def bitwarden_signin(logger, **kwargs):
+    if 'BW_HOST' in os.environ:
+        output = os.popen(f"bw config server {os.getenv('BW_HOST')}")
+    else:
+        logger.info(f"BW_HOST not set. Assuming SaaS installation")
 
 @kopf.on.create('bitwarden-secrets.lerentis.uploadfilter24.eu')
 def create_fn(spec, name, namespace, logger, **kwargs):
@@ -15,37 +24,23 @@ def create_fn(spec, name, namespace, logger, **kwargs):
 
     api = kubernetes.client.CoreV1Api()
 
-    # TODO: this should better be a os lookup
-    #with open('/home/bw-operator/templates/username-password.yaml.j2') as file_:
-    #    template = Template(file_.read())
-
-    #data = template.render(
-    #    original_crd=name,
-    #    secret_name=secret_name,
-    #    namespace=secret_namespace,
-    #    username=str(base64.b64encode("test".encode("utf-8")), "utf-8"),
-    #    password=str(base64.b64encode("test".encode("utf-8")), "utf-8")
-    #)
-
-    metadata = {
-        'name': secret_name,
-        'namespace': secret_namespace
+    annotations = {
+        "managed": "bitwarden-secrets.lerentis.uploadfilter24.eu",
+        "managedObject": name
+    }
+    secret = kubernetes.client.V1Secret()
+    secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name, annotations=annotations)
+    secret.type = "Opaque"
+    secret.data = {
+            'username': str(base64.b64encode("test".encode("utf-8")), "utf-8"),
+            'password': str(base64.b64encode("test".encode("utf-8")), "utf-8")
         }
-    data = {
-        'username': str(base64.b64encode("test".encode("utf-8")), "utf-8"),
-        'password': str(base64.b64encode("test".encode("utf-8")), "utf-8")
-        }
-    api_version = 'v1'
-    kind = 'Secret'
-    body = kubernetes.client.V1Secret(api_version, data , kind, metadata, 
-    type='Opaque')
 
     obj = api.create_namespaced_secret(
-        namespace=secret_namespace,
-        body=body
+        secret_namespace, secret
     )
 
-    logger.info(f"Secret {name} is created: {obj}")
+    logger.info(f"Secret {secret_namespace}/{secret_name} is created")
 
 
 @kopf.on.update('bitwarden-secrets.lerentis.uploadfilter24.eu')
@@ -53,5 +48,5 @@ def my_handler(spec, old, new, diff, **_):
     pass
 
 @kopf.on.delete('bitwarden-secrets.lerentis.uploadfilter24.eu')
-def my_handler(spec, **_):
+def my_handler(spec, name, namespace, logger, **kwargs):
     pass
