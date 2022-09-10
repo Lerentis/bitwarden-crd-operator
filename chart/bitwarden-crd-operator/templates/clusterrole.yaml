@@ -6,7 +6,7 @@ rules:
 - apiGroups: ["lerentis.uploadfilter24.eu"]
   resources: ["bitwarden-secrets"]
   verbs: ["get", "watch", "list", "create", "delete", "patch", "update"]
-- apiGroups: ["v1"]
+- apiGroups: [""]
   resources: ["secrets"]
   verbs: ["get", "watch", "list", "create", "delete", "patch", "update"]
 - apiGroups: [""]

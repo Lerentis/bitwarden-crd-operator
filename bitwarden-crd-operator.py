@@ -16,20 +16,33 @@ def create_fn(spec, name, namespace, logger, **kwargs):
     api = kubernetes.client.CoreV1Api()
 
     # TODO: this should better be a os lookup
-    with open('/home/bw-operator/templates/username-password.yaml.j2') as file_:
-        template = Template(file_.read())
+    #with open('/home/bw-operator/templates/username-password.yaml.j2') as file_:
+    #    template = Template(file_.read())
 
-    data = template.render(
-        original_crd=name,
-        secret_name=secret_name,
-        namespace=secret_namespace,
-        username=str(base64.b64encode("test".encode("utf-8")), "utf-8"),
-        password=str(base64.b64encode("test".encode("utf-8")), "utf-8")
-    )
+    #data = template.render(
+    #    original_crd=name,
+    #    secret_name=secret_name,
+    #    namespace=secret_namespace,
+    #    username=str(base64.b64encode("test".encode("utf-8")), "utf-8"),
+    #    password=str(base64.b64encode("test".encode("utf-8")), "utf-8")
+    #)
+
+    metadata = {
+        'name': secret_name,
+        'namespace': secret_namespace
+        }
+    data = {
+        'username': str(base64.b64encode("test".encode("utf-8")), "utf-8"),
+        'password': str(base64.b64encode("test".encode("utf-8")), "utf-8")
+        }
+    api_version = 'v1'
+    kind = 'Secret'
+    body = kubernetes.client.V1Secret(api_version, data , kind, metadata, 
+    type='Opaque')
 
     obj = api.create_namespaced_secret(
         namespace=secret_namespace,
-        body=data
+        body=body
     )
 
     logger.info(f"Secret {name} is created: {obj}")
