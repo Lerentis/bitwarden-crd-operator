@@ -21,6 +21,8 @@ fullnameOverride: ""
 #    value: "define_it"
 #  - name: BW_CLIENTSECRET
 #    value: "define_it"
+#  - name: BW_PASSWORD
+#    value: "define_id"
 
 serviceAccount:
   # Specifies whether a service account should be created
