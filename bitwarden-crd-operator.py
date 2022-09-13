@@ -3,26 +3,34 @@ import kopf
 import kubernetes
 import base64
 import os
+import subprocess
 import json
 
-def get_secret_from_bitwarden(id):
-    return command_wrapper(f" item {id}")
+def get_secret_from_bitwarden(logger, id):
+    return command_wrapper(logger, f"get item {id}")
 
-def command_wrapper(command):
-    output = os.os.popen(f"bw {command}")
-    return output
+def unlock_bw(logger):
+    token_output = command_wrapper(logger, "unlock --passwordenv BW_PASSWORD")
+    tokens = token_output.split('"')[1::2]
+    os.environ["BW_SESSION"] = tokens[1]
+    logger.info("Signin successful. Session exported")
+
+def command_wrapper(logger, command):
+    system_env = dict(os.environ)
+    sp = subprocess.Popen([f"bw {command}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True, shell=True, env=system_env)
+    out, err = sp.communicate()
+    if err:
+        logger.warn(f"Error during bw cli invokement: {err}")
+    return str(out)
 
 @kopf.on.startup()
 def bitwarden_signin(logger, **kwargs):
     if 'BW_HOST' in os.environ:
-        output = os.popen(f"bw config server {os.getenv('BW_HOST')}")
+        command_wrapper(logger, f"config server {os.getenv('BW_HOST')}")
     else:
         logger.info(f"BW_HOST not set. Assuming SaaS installation")
-    command_wrapper("login --apikey")
-    token_output = command_wrapper("unlock --passwordenv BW_PASSWORD")
-    for line in token_output:
-        if "export BW_SESSION" in line:
-            os.popen(line.replace("$", ""))
+    command_wrapper(logger, "login --apikey")
+    unlock_bw(logger)
 
 @kopf.on.create('bitwarden-secrets.lerentis.uploadfilter24.eu')
 def create_fn(spec, name, namespace, logger, **kwargs):
@@ -32,7 +40,11 @@ def create_fn(spec, name, namespace, logger, **kwargs):
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
 
-    secret_json_object = json.loads(get_secret_from_bitwarden(id))
+    unlock_bw(logger)
+
+    secret_json_string = get_secret_from_bitwarden(logger, id)
+    
+    secret_json_object = json.loads(secret_json_string)
 
     api = kubernetes.client.CoreV1Api()
 
