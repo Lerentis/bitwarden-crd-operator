@@ -21,7 +21,7 @@ def command_wrapper(logger, command):
     out, err = sp.communicate()
     if err:
         logger.warn(f"Error during bw cli invokement: {err}")
-    return str(out)
+    return out.decode(encoding='UTF-8')
 
 @kopf.on.startup()
 def bitwarden_signin(logger, **kwargs):
@@ -41,23 +41,21 @@ def create_fn(spec, name, namespace, logger, **kwargs):
     secret_namespace = spec.get('namespace')
 
     unlock_bw(logger)
-
-    secret_json_string = get_secret_from_bitwarden(logger, id)
     
-    secret_json_object = json.loads(secret_json_string)
+    secret_json_object = json.loads(get_secret_from_bitwarden(logger, id))
 
     api = kubernetes.client.CoreV1Api()
 
     annotations = {
         "managed": "bitwarden-secrets.lerentis.uploadfilter24.eu",
-        "managedObject": name
+        "managedObject": f"{namespace}/{name}"
     }
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name, annotations=annotations)
     secret.type = "Opaque"
     secret.data = {
-            'username': str(base64.b64encode(secret_json_object["login.username"].encode("utf-8")), "utf-8"),
-            'password': str(base64.b64encode(secret_json_object["login.password"].encode("utf-8")), "utf-8")
+            'username': str(base64.b64encode(secret_json_object["login"]["username"].encode("utf-8")), "utf-8"),
+            'password': str(base64.b64encode(secret_json_object["login"]["password"].encode("utf-8")), "utf-8")
         }
 
     obj = api.create_namespaced_secret(
