@@ -27,7 +27,7 @@ COPY --chown=bw-operator:bw-operator bitwarden-crd-operator.py /home/bw-operator
 USER bw-operator
 
 RUN set -eux; \
-    pip install -r requirements.txt
+    pip install -r requirements.txt --no-warn-script-location
 
 ENTRYPOINT [ "/home/bw-operator/.local/bin/kopf", "run", "--all-namespaces", "--liveness=http://0.0.0.0:8080/healthz" ]
 CMD [ "/home/bw-operator/bitwarden-crd-operator.py" ]
