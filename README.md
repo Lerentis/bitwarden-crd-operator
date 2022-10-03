@@ -31,8 +31,10 @@ env:
 After that it is a basic helm deployment:
 
 ```bash
+helm repo add bitwarden-operator https://lerentis.github.io/bitwarden-crd-operator
+helm repo update 
 kubectl create namespace bw-operator
-helm upgrade --install --namespace bw-operator -f chart/bitwarden-crd-operator/values.yaml bw-operator chart/bitwarden-crd-operator
+helm upgrade --install --namespace bw-operator -f values.yaml bw-operator bitwarden-operator/bitwarden-crd-operator
 ```
 
 And you are set to create your first secret using this operator. For that you need to add a CRD Object like this to your cluster:
@@ -75,8 +77,8 @@ type: Opaque
 
 ## Short Term Roadmap
 
-[] support more types  
-[] offer option to use a existing secret in helm chart  
-[x] host chart on gh pages  
-[x] write release pipeline  
-[x] maybe extend spec to offer modification of keys as well
+- [ ] support more types
+- [ ] offer option to use a existing secret in helm chart
+- [x] host chart on gh pages
+- [x] write release pipeline
+- [x] maybe extend spec to offer modification of keys as well
