@@ -1,1 +1,2 @@
-Have fun :) 
+Bitwarden CRD Operator has been deployed. 
+Go ahead and create some secrets directly from bitwarden
