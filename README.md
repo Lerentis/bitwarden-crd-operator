@@ -77,6 +77,6 @@ type: Opaque
 
 [] support more types  
 [] offer option to use a existing secret in helm chart  
-[] host chart on gh pages  
-[] write release pipeline  
+[x] host chart on gh pages  
+[x] write release pipeline  
 [x] maybe extend spec to offer modification of keys as well

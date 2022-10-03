@@ -43,3 +43,32 @@ steps:
       - push
       - pull_request
       - cron
+---
+kind: pipeline
+type: kubernetes
+name: release-bitwarden-crd-operator
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: release-bitwarden-crd-operator
+    image: plugins/kaniko
+    settings:
+      dockerfile: Dockerfile
+      password:
+        from_secret: docker_password
+      username:
+        from_secret: docker_username
+      repo: lerentis/bitwarden-crd-operator
+      tags:
+        - latest
+        - ${DRONE_TAG##v}
+    when:
+      event:
+      - tag
+    resources:
+      limits:
+        cpu: 200
+        memory: 1024MiB
