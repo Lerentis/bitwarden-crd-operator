@@ -1,10 +1,16 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta1"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta2"
 kind: BitwardenSecret
 metadata:
   name: test
 spec:
-  type: "password"
-  id: "123456"
+  content:
+    - element:
+        secretName: username
+        secretRef: nameofUser 
+    - element:
+        secretName: password
+        secretRef: passwordOfUser 
+  id: "88781348-c81c-4367-9801-550360c21295"
   name: "test-secret"
   namespace: "default"

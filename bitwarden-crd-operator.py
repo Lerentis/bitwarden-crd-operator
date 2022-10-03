@@ -6,6 +6,8 @@ import os
 import subprocess
 import json
 
+from pprint import pprint
+
 def get_secret_from_bitwarden(logger, id):
     return command_wrapper(logger, f"get item {id}")
 
@@ -33,9 +35,9 @@ def bitwarden_signin(logger, **kwargs):
     unlock_bw(logger)
 
 @kopf.on.create('bitwarden-secrets.lerentis.uploadfilter24.eu')
-def create_fn(spec, name, namespace, logger, **kwargs):
+def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
-    type = spec.get('type')
+    content_def = body['spec']['content']
     id = spec.get('id')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
@@ -53,10 +55,16 @@ def create_fn(spec, name, namespace, logger, **kwargs):
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name, annotations=annotations)
     secret.type = "Opaque"
-    secret.data = {
-            'username': str(base64.b64encode(secret_json_object["login"]["username"].encode("utf-8")), "utf-8"),
-            'password': str(base64.b64encode(secret_json_object["login"]["password"].encode("utf-8")), "utf-8")
-        }
+    secret.data = {}
+    for eleml in content_def:
+        for k, elem in eleml.items():
+            for key,value in elem.items():
+                if key == "secretName":
+                    _secret_key = value
+                if key == "secretRef":
+                    _secret_ref = value
+            
+            secret.data[_secret_ref] = str(base64.b64encode(secret_json_object["login"][_secret_key].encode("utf-8")), "utf-8")
 
     obj = api.create_namespaced_secret(
         secret_namespace, secret
@@ -70,5 +78,13 @@ def my_handler(spec, old, new, diff, **_):
     pass
 
 @kopf.on.delete('bitwarden-secrets.lerentis.uploadfilter24.eu')
-def my_handler(spec, name, namespace, logger, **kwargs):
-    pass
+def delete_managed_secret(spec, name, namespace, logger, **kwargs):
+    secret_name = spec.get('name')
+    secret_namespace = spec.get('namespace')
+    api = kubernetes.client.CoreV1Api()
+
+    try:
+        api.delete_namespaced_secret(secret_name, secret_namespace)
+        logger.info(f"Secret {secret_namespace}/{secret_name} has been deleted")
+    except:
+        logger.warn(f"Could not delete secret {secret_namespace}/{secret_name}!")

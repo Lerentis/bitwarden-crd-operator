@@ -39,12 +39,18 @@ And you are set to create your first secret using this operator. For that you ne
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta1"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta2"
 kind: BitwardenSecret
 metadata:
   name: name-of-your-management-object
 spec:
-  type: "UsernamePassword"
+  content:
+    - element:
+        secretName: nameOfTheFieldInBitwarden # for example username
+        secretRef: nameOfTheKeyInTheSecretToBeCreated 
+    - element:
+        secretName: nameOfAnotherFieldInBitwarden # for example password
+        secretRef: nameOfAnotherKeyInTheSecretToBeCreated 
   id: "A Secret ID from bitwarden"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
@@ -55,8 +61,8 @@ The ID can be extracted from the browser when you open a item the ID is in the U
 ```yaml
 apiVersion: v1
 data:
-  password: "base64 encoded password"
-  username: "base64 encoded username"
+  nameOfTheKeyInTheSecretToBeCreated: "base64 encoded value of TheFieldInBitwarden"
+  nameOfAnotherKeyInTheSecretToBeCreated: "base64 encoded value of AnotherFieldInBitwarden"
 kind: Secret
 metadata:
   annotations:
@@ -73,4 +79,4 @@ type: Opaque
 [] offer option to use a existing secret in helm chart  
 [] host chart on gh pages  
 [] write release pipeline  
-[] maybe extend spec to offer modification of keys as well
+[x] maybe extend spec to offer modification of keys as well
