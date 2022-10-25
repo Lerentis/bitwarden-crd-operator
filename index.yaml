@@ -3,6 +3,45 @@ entries:
   bitwarden-crd-operator:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: "fixed kube version typo"
+      artifacthub.io/crds: |
+        - kind: BitwardenSecret
+          version: v1beta2
+          name: bitwarden-secret
+          displayName: Bitwarden Secret
+          description: Management Object to create secrets from bitwarden
+      artifacthub.io/images: |
+        - name: bitwarden-crd-operator
+          image: lerentis/bitwarden-crd-operator:0.1.2
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/Lerentis/bitwarden-crd-operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: 0.1.2
+    created: "2022-10-25T20:05:06.456767085Z"
+    description: Deploy the Bitwarden CRD Operator
+    digest: db25af0e5a64a04ca3aeee4e220029d075d407d6d07e5f72a14b973cc8face53
+    home: https://lerentis.github.io/bitwarden-crd-operator/
+    keywords:
+    - operator
+    - bitwarden
+    - vaultwarden
+    kubeVersion: '>= 1.23.0-0'
+    maintainers:
+    - email: lerentis+helm@uploadfilter24.eu
+      name: lerentis
+    name: bitwarden-crd-operator
+    sources:
+    - https://github.com/Lerentis/bitwarden-crd-operator
+    type: application
+    urls:
+    - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.2.1/bitwarden-crd-operator-v0.2.1.tgz
+    version: v0.2.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: "added possibility to configure operator from existing secret"
       artifacthub.io/crds: |
@@ -40,4 +79,4 @@ entries:
     urls:
     - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.2.0/bitwarden-crd-operator-v0.2.0.tgz
     version: v0.2.0
-generated: "2022-10-25T19:16:19.831144668Z"
+generated: "2022-10-25T20:05:06.456774885Z"
