@@ -24,6 +24,11 @@ fullnameOverride: ""
 #  - name: BW_PASSWORD
 #    value: "define_id"
 
+externalConfigSecret:
+  enabled: false
+
+  name: ""
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
