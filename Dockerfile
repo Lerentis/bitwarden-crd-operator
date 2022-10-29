@@ -38,7 +38,7 @@ RUN set -eux; \
     chown -R bw-operator /home/bw-operator; \
     chmod +x /usr/local/bin/bw; \
     apt-get update; \
-    apt-upgrade -y; \
+    apt-get upgrade -y; \
     apt-get install -y --no-install-recommends python3 python3-pip; \
     apt-get clean;
 
