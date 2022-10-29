@@ -3,6 +3,50 @@ entries:
   bitwarden-crd-operator:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: "Added support for regestry credentials"
+      artifacthub.io/crds: |
+        - kind: BitwardenSecret
+          version: v1beta3
+          name: bitwarden-secret
+          displayName: Bitwarden Secret
+          description: Management Object to create secrets from bitwarden
+        - kind: RegistryCredential
+          version: v1beta3
+          name: registry-credential
+          displayName: Regestry Credentials
+          description: Management Object to create regestry secrets from bitwarden
+      artifacthub.io/images: |
+        - name: bitwarden-crd-operator
+          image: lerentis/bitwarden-crd-operator:0.2.0
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/Lerentis/bitwarden-crd-operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: 0.2.0
+    created: "2022-10-29T22:39:14.568017194Z"
+    description: Deploy the Bitwarden CRD Operator
+    digest: 38271fb997f37e21863c9b1c187807819f0cc0aa2dc5e045e36f3bd86f7eae23
+    home: https://lerentis.github.io/bitwarden-crd-operator/
+    keywords:
+    - operator
+    - bitwarden
+    - vaultwarden
+    kubeVersion: '>= 1.23.0-0'
+    maintainers:
+    - email: lerentis+helm@uploadfilter24.eu
+      name: lerentis
+    name: bitwarden-crd-operator
+    sources:
+    - https://github.com/Lerentis/bitwarden-crd-operator
+    type: application
+    urls:
+    - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.3.0/bitwarden-crd-operator-v0.3.0.tgz
+    version: v0.3.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: "fixed kube version typo"
       artifacthub.io/crds: |
@@ -79,4 +123,4 @@ entries:
     urls:
     - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.2.0/bitwarden-crd-operator-v0.2.0.tgz
     version: v0.2.0
-generated: "2022-10-25T20:05:06.456774885Z"
+generated: "2022-10-29T22:39:14.568041195Z"
