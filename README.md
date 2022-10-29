@@ -45,11 +45,13 @@ kubectl create namespace bw-operator
 helm upgrade --install --namespace bw-operator -f values.yaml bw-operator bitwarden-operator/bitwarden-crd-operator
 ```
 
+## BitwardenSecret
+
 And you are set to create your first secret using this operator. For that you need to add a CRD Object like this to your cluster:
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta2"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta3"
 kind: BitwardenSecret
 metadata:
   name: name-of-your-management-object
@@ -81,6 +83,41 @@ metadata:
   name: name-of-your-management-object
   namespace: default
 type: Opaque
+```
+
+## RegistryCredential
+
+For managing registry credentials, or pull secrets, you can create another kind of object to let the operator create these as well for you:
+
+```yaml
+---
+apiVersion: "lerentis.uploadfilter24.eu/v1beta3"
+kind: RegistryCredential
+metadata:
+  name: name-of-your-management-object
+spec:
+  usernameRef: nameOfTheFieldInBitwarden # for example username
+  passwordRef: nameOfTheFieldInBitwarden # for example password
+  registry: "docker.io"
+  id: "A Secret ID from bitwarden"
+  name: "Name of the secret to be created"
+  namespace: "Namespace of the secret to be created"
+```
+
+The resulting secret looks something like this:
+
+```yaml
+apiVersion: v1
+data:
+  .dockerconfigjson: "base64 encoded json auth string for your registry"
+kind: Secret
+metadata:
+  annotations:
+    managed: bitwarden-secrets.lerentis.uploadfilter24.eu
+    managedObject: bw-operator/test
+  name: name-of-your-management-object
+  namespace: default
+type: dockerconfigjson
 ```
 
 ## Short Term Roadmap

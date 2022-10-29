@@ -1,0 +1,12 @@
+---
+apiVersion: "lerentis.uploadfilter24.eu/v1beta3"
+kind: RegistryCredential
+metadata:
+  name: test
+spec:
+  usernameRef: "username"
+  passwordRef: "password"
+  registry: "docker.io"
+  id: "3b249ec7-9ce7-440a-9558-f34f3ab10680"
+  name: "test-regcred"
+  namespace: "default"
