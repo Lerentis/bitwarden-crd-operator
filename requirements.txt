@@ -1,2 +1,2 @@
-kopf
-kubernetes
+kopf==1.35.6
+kubernetes==24.2.0

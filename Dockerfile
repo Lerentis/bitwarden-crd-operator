@@ -40,14 +40,16 @@ RUN set -eux; \
     apt-get update; \
     apt-get upgrade -y; \
     apt-get install -y --no-install-recommends python3 python3-pip; \
-    apt-get clean;
+    apt-get clean; \
+    apt-get -y autoremove; \
+    pip install -r requirements.txt; \
+    rm requirements.txt; \
+    pip cache purge; \
+    rm -rf /root/.cache;
 
-COPY --chown=bw-operator:bw-operator bitwarden-crd-operator.py /home/bw-operator/bitwarden-crd-operator.py
+COPY --chown=bw-operator:bw-operator src /home/bw-operator
 
 USER bw-operator
 
-RUN set -eux; \
-    pip install -r requirements.txt --no-warn-script-location
-
-ENTRYPOINT [ "/home/bw-operator/.local/bin/kopf", "run", "--all-namespaces", "--liveness=http://0.0.0.0:8080/healthz" ]
-CMD [ "/home/bw-operator/bitwarden-crd-operator.py" ]
+ENTRYPOINT [ "kopf", "run", "--all-namespaces", "--liveness=http://0.0.0.0:8080/healthz" ]
+CMD [ "/home/bw-operator/bitwardenCrdOperator.py", "/home/bw-operator/kv.py", "/home/bw-operator/dockerlogin.py" ]
