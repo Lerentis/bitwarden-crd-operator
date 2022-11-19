@@ -7,45 +7,20 @@ RUN apk add wget unzip
 RUN cd /tmp && wget https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/bw-linux-${BW_VERSION}.zip && \
     unzip /tmp/bw-linux-${BW_VERSION}.zip
 
-#FROM alpine:3.18 as run
-#
-#RUN set -eux; \
-#    groupadd -r bw-operator ; \
-#    useradd -r -g bw-operator -s /sbin/nologin bw-operator; \
-#    mkdir -p /home/bw-operator; \
-#    chown -R bw-operator /home/bw-operator; \
-#    chmod +x /usr/local/bin/bw; \
-#    apk add libstdc++ python3 py-pip
-#COPY --chown=bw-operator:bw-operator bitwarden-crd-operator.py /home/bw-operator/bitwarden-crd-operator.py
-#
-#USER bw-operator
-#
-#RUN set -eux; \
-#    pip install -r requirements.txt --no-warn-script-location
-#
-#ENTRYPOINT [ "/home/bw-operator/.local/bin/kopf", "run", "--all-namespaces", "--liveness=http://0.0.0.0:8080/healthz" ]
-#CMD [ "/home/bw-operator/bitwarden-crd-operator.py" ]
-
-FROM ubuntu:jammy
+FROM alpine:3.17
 
 COPY --from=builder /tmp/bw /usr/local/bin/bw
 COPY requirements.txt requirements.txt
 
 RUN set -eux; \
-    groupadd -r bw-operator ; \
-    useradd -r -g bw-operator -s /sbin/nologin bw-operator; \
+    addgroup -S -g 1000 bw-operator; \
+    adduser -S -D -u 1000 -G bw-operator bw-operator; \
     mkdir -p /home/bw-operator; \
     chown -R bw-operator /home/bw-operator; \
     chmod +x /usr/local/bin/bw; \
-    apt-get update; \
-    apt-get upgrade -y; \
-    apt-get install -y --no-install-recommends python3 python3-pip; \
-    apt-get clean; \
-    apt-get -y autoremove; \
-    pip install -r requirements.txt; \
-    rm requirements.txt; \
-    pip cache purge; \
-    rm -rf /root/.cache;
+    apk add gcc musl-dev libstdc++ gcompat python3 py-pip; \
+    pip install -r requirements.txt --no-warn-script-location; \
+    apk del --purge gcc musl-dev libstdc++;
 
 COPY --chown=bw-operator:bw-operator src /home/bw-operator
 

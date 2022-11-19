@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.3.1"
+version: "v0.3.2"
 
-appVersion: "0.2.1"
+appVersion: "0.3.0"
 
 keywords:
   - operator
@@ -39,11 +39,42 @@ annotations:
       name: registry-credential
       displayName: Regestry Credentials
       description: Management Object to create regestry secrets from bitwarden
+  artifacthub.io/crdsExamples: |
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta3
+      kind: BitwardenSecret
+      metadata:
+        name: test
+      spec:
+        content:
+          - element:
+              secretName: username
+              secretRef: nameofUser 
+          - element:
+              secretName: password
+              secretRef: passwordOfUser 
+        id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+        name: "test-secret"
+        namespace: "default"
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta3
+      kind: RegistryCredential
+      metadata:
+        name: test
+      spec:
+        usernameRef: "username"
+        passwordRef: "password"
+        registry: "docker.io"
+        id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+        name: "test-regcred"
+        namespace: "default"
   artifacthub.io/license: MIT
   artifacthub.io/operator: "true"  
   artifacthub.io/changes: |
     - kind: changed
-      description: "Mainternence update and image rebuild to include upstream fixes"
+      description: "Switched to Alpine image"
+    - kind: added
+      description: "Added CRDs Example to artifactshub"
+    - kind: added
+      description: "Sign helm chart"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: lerentis/bitwarden-crd-operator:0.2.1
