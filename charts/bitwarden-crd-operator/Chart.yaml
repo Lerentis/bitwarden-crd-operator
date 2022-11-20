@@ -73,8 +73,6 @@ annotations:
       description: "Switched to Alpine image"
     - kind: added
       description: "Added CRDs Example to artifactshub"
-    - kind: added
-      description: "Sign helm chart"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: lerentis/bitwarden-crd-operator:0.2.1
+      image: lerentis/bitwarden-crd-operator:0.3.0
