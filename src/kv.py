@@ -27,8 +27,8 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
     secret_namespace = spec.get('namespace')
 
     unlock_bw(logger)
-    
-    secret_json_object = json.loads(get_secret_from_bitwarden(logger, id))
+    logger.info(f"Locking up secret with ID: {id}")
+    secret_json_object = json.loads(get_secret_from_bitwarden(id))
 
     api = kubernetes.client.CoreV1Api()
 

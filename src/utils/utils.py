@@ -1,8 +1,7 @@
 import os
 import subprocess
 
-def get_secret_from_bitwarden(logger, id):
-    logger.info(f"Locking up secret with ID: {id}")
+def get_secret_from_bitwarden(id):
     return command_wrapper(logger, f"get item {id}")
 
 def unlock_bw(logger):

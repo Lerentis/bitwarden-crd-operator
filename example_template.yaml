@@ -1,0 +1,19 @@
+---
+apiVersion: "lerentis.uploadfilter24.eu/v1beta1"
+kind: BitwardenTemplate
+metadata:
+  name: test
+spec:
+  filename: "config.yaml"
+  name: "test-regcred"
+  namespace: "default"
+  template: |
+    ---
+    api:
+      enabled: True
+      key: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "key") }}
+      allowCrossOrigin: false
+      apps:
+        "some.app.identifier:some_version":
+          pubkey: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "public_key") }}
+          enabled: true
