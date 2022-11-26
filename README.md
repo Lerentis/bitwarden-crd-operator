@@ -4,6 +4,10 @@
 
 Bitwarden CRD Operator is a kubernetes Operator based on [kopf](https://github.com/nolar/kopf/). The goal is to create kubernetes native secret objects from bitwarden.
 
+<p align="center">
+  <img src="logo.png" alt="Bitwarden CRD Operator Logo" width="200"/>
+</p>
+
 > DISCLAIMER:  
 > This project is still very work in progress :)
 
