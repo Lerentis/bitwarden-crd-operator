@@ -13,7 +13,7 @@ spec:
     shortNames:
       - bwt
   versions:
-    - name: v1beta1
+    - name: v1beta4
       served: true
       storage: true
       schema:

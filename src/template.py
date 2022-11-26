@@ -22,7 +22,7 @@ def create_template_secret(secret, filename, template):
     secret.data[filename] = str(base64.b64encode(render_template(template).encode("utf-8")), "utf-8")
     return secret
 
-@kopf.on.create('bitwarden-templates.lerentis.uploadfilter24.eu')
+@kopf.on.create('bitwarden-template.lerentis.uploadfilter24.eu')
 def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
     template = spec.get('template')
@@ -35,12 +35,12 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
     api = kubernetes.client.CoreV1Api()
 
     annotations = {
-        "managed": "bitwarden-templates.lerentis.uploadfilter24.eu",
+        "managed": "bitwarden-template.lerentis.uploadfilter24.eu",
         "managedObject": f"{namespace}/{name}"
     }
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name, annotations=annotations)
-    secret = create_managed_secret(secret, filename, template)
+    secret = create_template_secret(secret, filename, template)
 
     obj = api.create_namespaced_secret(
         secret_namespace, secret
@@ -48,11 +48,11 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
     logger.info(f"Secret {secret_namespace}/{secret_name} has been created")
 
-@kopf.on.update('bitwarden-templates.lerentis.uploadfilter24.eu')
+@kopf.on.update('bitwarden-template.lerentis.uploadfilter24.eu')
 def my_handler(spec, old, new, diff, **_):
     pass
 
-@kopf.on.delete('bitwarden-templates.lerentis.uploadfilter24.eu')
+@kopf.on.delete('bitwarden-template.lerentis.uploadfilter24.eu')
 def delete_managed_secret(spec, name, namespace, logger, **kwargs):
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')

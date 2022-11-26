@@ -3,7 +3,7 @@ import kubernetes
 import base64
 import json
 
-from utils.utils import unlock_bw, get_secret_from_bitwarden
+from utils.utils import unlock_bw, get_secret_from_bitwarden, parse_login_scope, parse_fields_scope
 
 def create_kv(secret, secret_json, content_def):
     secret.type = "Opaque"
@@ -15,10 +15,15 @@ def create_kv(secret, secret_json, content_def):
                     _secret_key = value
                 if key == "secretRef":
                     _secret_ref = value
-            secret.data[_secret_ref] = str(base64.b64encode(secret_json["login"][_secret_key].encode("utf-8")), "utf-8")
+                if key == "secretScope":
+                    _secret_scope = value
+            if _secret_scope == "login":
+                secret.data[_secret_ref] = str(base64.b64encode(parse_login_scope(secret_json, _secret_key).encode("utf-8")), "utf-8")
+            if _secret_scope == "fields":
+                secret.data[_secret_ref] = str(base64.b64encode(parse_fields_scope(secret_json, _secret_key).encode("utf-8")), "utf-8")
     return secret
 
-@kopf.on.create('bitwarden-secrets.lerentis.uploadfilter24.eu')
+@kopf.on.create('bitwarden-secret.lerentis.uploadfilter24.eu')
 def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
     content_def = body['spec']['content']
@@ -33,7 +38,7 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
     api = kubernetes.client.CoreV1Api()
 
     annotations = {
-        "managed": "bitwarden-secrets.lerentis.uploadfilter24.eu",
+        "managed": "bitwarden-secret.lerentis.uploadfilter24.eu",
         "managedObject": f"{namespace}/{name}"
     }
     secret = kubernetes.client.V1Secret()
@@ -46,11 +51,11 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
     logger.info(f"Secret {secret_namespace}/{secret_name} has been created")
 
-@kopf.on.update('bitwarden-secrets.lerentis.uploadfilter24.eu')
+@kopf.on.update('bitwarden-secret.lerentis.uploadfilter24.eu')
 def my_handler(spec, old, new, diff, **_):
     pass
 
-@kopf.on.delete('bitwarden-secrets.lerentis.uploadfilter24.eu')
+@kopf.on.delete('bitwarden-secret.lerentis.uploadfilter24.eu')
 def delete_managed_secret(spec, name, namespace, logger, **kwargs):
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
