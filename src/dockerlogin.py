@@ -3,7 +3,7 @@ import kubernetes
 import base64
 import json
 
-from bitwardenCrdOperator import unlock_bw, get_secret_from_bitwarden
+from utils.utils import unlock_bw, get_secret_from_bitwarden
 
 def create_dockerlogin(logger, secret, secret_json, username_ref, password_ref, registry):
     secret.type = "dockerconfigjson"
@@ -23,7 +23,7 @@ def create_dockerlogin(logger, secret, secret_json, username_ref, password_ref, 
     secret.data[".dockerconfigjson"] = str(base64.b64encode(json.dumps(auths_dict).encode("utf-8")), "utf-8")
     return secret
 
-@kopf.on.create('registry-credentials.lerentis.uploadfilter24.eu')
+@kopf.on.create('registry-credential.lerentis.uploadfilter24.eu')
 def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
     username_ref = spec.get('usernameRef')
     password_ref = spec.get('passwordRef')
@@ -33,13 +33,13 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
     secret_namespace = spec.get('namespace')
 
     unlock_bw(logger)
-    
-    secret_json_object = json.loads(get_secret_from_bitwarden(logger, id))
+    logger.info(f"Locking up secret with ID: {id}")
+    secret_json_object = json.loads(get_secret_from_bitwarden(id))
 
     api = kubernetes.client.CoreV1Api()
 
     annotations = {
-        "managed": "registry-credentials.lerentis.uploadfilter24.eu",
+        "managed": "registry-credential.lerentis.uploadfilter24.eu",
         "managedObject": f"{namespace}/{name}"
     }
     secret = kubernetes.client.V1Secret()
@@ -52,11 +52,11 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
 
     logger.info(f"Registry Secret {secret_namespace}/{secret_name} has been created")
 
-@kopf.on.update('registry-credentials.lerentis.uploadfilter24.eu')
+@kopf.on.update('registry-credential.lerentis.uploadfilter24.eu')
 def my_handler(spec, old, new, diff, **_):
     pass
 
-@kopf.on.delete('registry-credentials.lerentis.uploadfilter24.eu')
+@kopf.on.delete('registry-credential.lerentis.uploadfilter24.eu')
 def delete_managed_secret(spec, name, namespace, logger, **kwargs):
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')

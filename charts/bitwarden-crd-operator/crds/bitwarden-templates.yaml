@@ -2,16 +2,16 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: registry-credentials.lerentis.uploadfilter24.eu
+  name: bitwarden-templates.lerentis.uploadfilter24.eu
 spec:
   scope: Namespaced
   group: lerentis.uploadfilter24.eu
   names:
-    kind: RegistryCredential
-    plural: registry-credentials
-    singular: registry-credential
+    kind: BitwardenTemplate
+    plural: bitwarden-templates
+    singular: bitwarden-template
     shortNames:
-      - rgc
+      - bwt
   versions:
     - name: v1beta4
       served: true
@@ -23,22 +23,16 @@ spec:
             spec:
               type: object
               properties:
-                usernameRef:
+                filename:
                   type: string
-                passwordRef:
-                  type: string
-                registry:
-                  type: string
-                id:
+                template:
                   type: string
                 namespace:
                   type: string
                 name:
                   type: string
               required:
-                - id
+                - filename
+                - template
                 - namespace
                 - name
-                - usernameRef
-                - passwordRef
-                - registry
