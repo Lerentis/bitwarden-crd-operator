@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.3.2"
+version: "v0.4.0"
 
-appVersion: "0.3.0"
+appVersion: "0.4.0"
 
 keywords:
   - operator
@@ -69,10 +69,10 @@ annotations:
   artifacthub.io/license: MIT
   artifacthub.io/operator: "true"  
   artifacthub.io/changes: |
-    - kind: changed
-      description: "Switched to Alpine image"
     - kind: added
-      description: "Added CRDs Example to artifactshub"
+      description: "Added Template CRD"
+    - kind: added
+      description: "Added logo"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: lerentis/bitwarden-crd-operator:0.3.0

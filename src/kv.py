@@ -3,7 +3,7 @@ import kubernetes
 import base64
 import json
 
-from bitwardenCrdOperator import unlock_bw, get_secret_from_bitwarden
+from utils.utils import unlock_bw, get_secret_from_bitwarden
 
 def create_kv(secret, secret_json, content_def):
     secret.type = "Opaque"

@@ -4,7 +4,7 @@ metadata:
   name: {{ include "bitwarden-crd-operator.serviceAccountName" . }}-role
 rules:
 - apiGroups: ["lerentis.uploadfilter24.eu"]
-  resources: ["bitwarden-secrets", "registry-credentials"]
+  resources: ["bitwarden-secrets", "registry-credentials", "bitwarden-templates"]
   verbs: ["get", "watch", "list", "create", "delete", "patch", "update"]
 - apiGroups: [""]
   resources: ["secrets"]
