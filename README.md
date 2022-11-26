@@ -55,7 +55,7 @@ And you are set to create your first secret using this operator. For that you ne
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta3"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
 kind: BitwardenSecret
 metadata:
   name: name-of-your-management-object
@@ -64,9 +64,11 @@ spec:
     - element:
         secretName: nameOfTheFieldInBitwarden # for example username
         secretRef: nameOfTheKeyInTheSecretToBeCreated 
+        secretScope: login # for custom entries on bitwarden use 'fields' 
     - element:
         secretName: nameOfAnotherFieldInBitwarden # for example password
         secretRef: nameOfAnotherKeyInTheSecretToBeCreated 
+        secretScope: login # for custom entries on bitwarden use 'fields' 
   id: "A Secret ID from bitwarden"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
@@ -95,7 +97,7 @@ For managing registry credentials, or pull secrets, you can create another kind 
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta3"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
 kind: RegistryCredential
 metadata:
   name: name-of-your-management-object
@@ -123,3 +125,47 @@ metadata:
   namespace: default
 type: dockerconfigjson
 ```
+
+## BitwardenTemplate
+
+One of the more freely defined types that can be used with this operator you can just pass a whole template:
+
+```yaml
+---
+apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+kind: BitwardenTemplate
+metadata:
+  name: name-of-your-management-object
+spec:
+  filename: "Key of the secret to be created"
+  name: "Name of the secret to be created"
+  namespace: "Namespace of the secret to be created"
+  template: |
+    ---
+    api:
+      enabled: True
+      key: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields", "name of a field in bitwarden") }}
+      allowCrossOrigin: false
+      apps:
+        "some.app.identifier:some_version":
+          pubkey: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields", "name of a field in bitwarden") }}
+          enabled: true
+```
+
+This will result in something like the following object:
+
+```yaml
+apiVersion: v1
+data:
+  Key of the secret to be created: "base64 encoded and rendered template with secrets injected directly from bitwarden"
+kind: Secret
+metadata:
+  annotations:
+    managed: bitwarden-template.lerentis.uploadfilter24.eu
+    managedObject: namespace/name-of-your-management-object
+  name: Name of the secret to be created
+  namespace: Namespace of the secret to be created
+type: Opaque
+```
+
+please note that the rendering engine for this template is jinja2, with an addition of a custom `bitwarden_lookup` function, so there are more possibilities to inject here.
