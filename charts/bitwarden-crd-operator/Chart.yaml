@@ -4,7 +4,7 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.4.0"
+version: "v0.4.1"
 
 appVersion: "0.4.0"
 
@@ -85,23 +85,17 @@ annotations:
           ---
           api:
             enabled: True
-            key: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "key") }}
+            key: {{ bitwarden_lookup("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "fields", "key") }}
             allowCrossOrigin: false
             apps:
               "some.app.identifier:some_version":
-                pubkey: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "public_key") }}
+                pubkey: {{ bitwarden_lookup("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "fields", "public_key") }}
                 enabled: true  
   artifacthub.io/license: MIT
   artifacthub.io/operator: "true"  
   artifacthub.io/changes: |
-    - kind: added
-      description: "Added Template type"
-    - kind: added
-      description: "Added logo"
-    - kind: changed
-      description: "BitwardenSecret now requires a 'secretScope' to be defined. Can eigher be 'login' or 'fields'"
     - kind: fixed
-      description: "fixed hardcoded reference to 'login' even tho secrets could also be in 'fields' scope"
+      description: "Fixed documentation and examples"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: lerentis/bitwarden-crd-operator:0.4.0
