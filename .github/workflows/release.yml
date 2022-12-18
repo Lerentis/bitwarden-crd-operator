@@ -32,3 +32,14 @@ jobs:
           charts_dir: charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Get app version from chart
+        uses: mikefarah/yq@v4.30.6
+        id: app_version
+        with:
+          cmd: yq '.appVersion' charts/bitwarden-crd-operator/Chart.yaml
+
+      - name: Publish SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: lerentis/bitwarden-crd-operator:${{ steps.app_version.outputs.result }}
