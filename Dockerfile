@@ -9,6 +9,10 @@ RUN cd /tmp && wget https://github.com/bitwarden/clients/releases/download/cli-v
 
 FROM alpine:3.17
 
+ARG PYTHON_VERSION=3.10.9-r1
+ARG PIP_VERSION=22.3.1-r1
+ARG GCOMPAT_VERSION=1.1.0-r0
+
 COPY --from=builder /tmp/bw /usr/local/bin/bw
 COPY requirements.txt requirements.txt
 
@@ -18,7 +22,7 @@ RUN set -eux; \
     mkdir -p /home/bw-operator; \
     chown -R bw-operator /home/bw-operator; \
     chmod +x /usr/local/bin/bw; \
-    apk add gcc musl-dev libstdc++ gcompat python3 py-pip; \
+    apk add gcc musl-dev libstdc++ gcompat=${GCOMPAT_VERSION} python3=${PYTHON_VERSION} py-pip=${PIP_VERSION}; \
     pip install -r requirements.txt --no-warn-script-location; \
     apk del --purge gcc musl-dev libstdc++;
 
