@@ -39,7 +39,12 @@ jobs:
         with:
           cmd: yq '.appVersion' charts/bitwarden-crd-operator/Chart.yaml
 
-      - name: Publish SBOM
+      - name: Create SBOM
         uses: anchore/sbom-action@v0
         with:
           image: lerentis/bitwarden-crd-operator:${{ steps.app_version.outputs.result }}
+        
+      - name: Publish SBOM
+        uses: anchore/sbom-action/publish-sbom@v0
+        with:
+          sbom-artifact-match: ".*\\.spdx$"
