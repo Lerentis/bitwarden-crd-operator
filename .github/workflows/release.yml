@@ -47,4 +47,17 @@ jobs:
       - name: Publish SBOM
         uses: anchore/sbom-action/publish-sbom@v0
         with:
-          sbom-artifact-match: ".*\\.spdx$"
+          sbom-artifact-match: ".*\\.spdx\\.json"
+
+      - name: Get Latest Tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+
+      - name: Add SBOM to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: lerentis-bitwarden-crd-operator_*.spdx.json
+          tag:  ${{ steps.previoustag.outputs.tag }}
+          overwrite: false
