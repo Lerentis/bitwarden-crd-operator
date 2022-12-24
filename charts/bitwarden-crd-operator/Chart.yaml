@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.4.2"
+version: "v0.4.3"
 
-appVersion: "0.4.1"
+appVersion: "0.4.2"
 
 keywords:
   - operator
@@ -100,4 +100,4 @@ annotations:
       description: "Upload SBOM to GitHub Release"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: lerentis/bitwarden-crd-operator:0.4.1
+      image: lerentis/bitwarden-crd-operator:0.4.2
