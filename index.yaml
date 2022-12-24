@@ -42,6 +42,75 @@ entries:
         \"fields\", \"public_key\") }}\n            enabled: true  \n"
       artifacthub.io/images: |
         - name: bitwarden-crd-operator
+          image: lerentis/bitwarden-crd-operator:0.4.2
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/Lerentis/bitwarden-crd-operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: 0.4.2
+    created: "2022-12-24T16:42:45.784692293Z"
+    description: Deploy the Bitwarden CRD Operator
+    digest: 656d403399eca0051e00d76d129344dbec3f4e053d5a5d685c8306d8e2f942a8
+    home: https://lerentis.github.io/bitwarden-crd-operator/
+    icon: https://lerentis.github.io/bitwarden-crd-operator/logo.png
+    keywords:
+    - operator
+    - bitwarden
+    - vaultwarden
+    kubeVersion: '>= 1.23.0-0'
+    maintainers:
+    - email: lerentis+helm@uploadfilter24.eu
+      name: lerentis
+    name: bitwarden-crd-operator
+    sources:
+    - https://github.com/Lerentis/bitwarden-crd-operator
+    type: application
+    urls:
+    - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.4.3/bitwarden-crd-operator-v0.4.3.tgz
+    version: v0.4.3
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
+          description: "Updated Dependencies to fix CVEs"
+        - kind: added
+          description: "Upload SBOM to GitHub Release"
+      artifacthub.io/crds: |
+        - kind: BitwardenSecret
+          version: v1beta4
+          name: bitwarden-secret
+          displayName: Bitwarden Secret
+          description: Management Object to create secrets from bitwarden
+        - kind: RegistryCredential
+          version: v1beta4
+          name: registry-credential
+          displayName: Regestry Credentials
+          description: Management Object to create regestry secrets from bitwarden
+        - kind: BitwardenTemplate
+          version: v1beta1
+          name: bitwarden-template
+          displayName: Bitwarden Template
+          description: Management Object to create secrets from a jinja template with a bitwarden lookup
+      artifacthub.io/crdsExamples: "- apiVersion: lerentis.uploadfilter24.eu/v1beta4\n
+        \ kind: BitwardenSecret\n  metadata:\n    name: test\n  spec:\n    content:\n
+        \     - element:\n          secretName: username\n          secretRef: nameofUser
+        \n      - element:\n          secretName: password\n          secretRef: passwordOfUser
+        \n    id: \"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\"\n    name: \"test-secret\"\n
+        \   namespace: \"default\"\n- apiVersion: lerentis.uploadfilter24.eu/v1beta4\n
+        \ kind: RegistryCredential\n  metadata:\n    name: test\n  spec:\n    usernameRef:
+        \"username\"\n    passwordRef: \"password\"\n    registry: \"docker.io\"\n
+        \   id: \"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\"\n    name: \"test-regcred\"\n
+        \   namespace: \"default\"\n- apiVersion: \"lerentis.uploadfilter24.eu/v1beta4\"\n
+        \ kind: BitwardenTemplate\n  metadata:\n    name: test\n  spec:\n    filename:
+        \"config.yaml\"\n    name: \"test-regcred\"\n    namespace: \"default\"\n
+        \   template: |\n      ---\n      api:\n        enabled: True\n        key:
+        {{ bitwarden_lookup(\"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\", \"fields\",
+        \"key\") }}\n        allowCrossOrigin: false\n        apps:\n          \"some.app.identifier:some_version\":\n
+        \           pubkey: {{ bitwarden_lookup(\"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\",
+        \"fields\", \"public_key\") }}\n            enabled: true  \n"
+      artifacthub.io/images: |
+        - name: bitwarden-crd-operator
           image: lerentis/bitwarden-crd-operator:0.4.1
       artifacthub.io/license: MIT
       artifacthub.io/links: |
@@ -432,4 +501,4 @@ entries:
     urls:
     - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.2.0/bitwarden-crd-operator-v0.2.0.tgz
     version: v0.2.0
-generated: "2022-12-18T15:32:33.295108767Z"
+generated: "2022-12-24T16:42:45.784723293Z"
