@@ -30,5 +30,5 @@ COPY --chown=bw-operator:bw-operator src /home/bw-operator
 
 USER bw-operator
 
-ENTRYPOINT [ "kopf", "run", "--all-namespaces", "--liveness=http://0.0.0.0:8080/healthz" ]
+ENTRYPOINT [ "kopf", "run", "--log-format=json", "--all-namespaces", "--liveness=http://0.0.0.0:8080/healthz" ]
 CMD [ "/home/bw-operator/bitwardenCrdOperator.py", "/home/bw-operator/kv.py", "/home/bw-operator/dockerlogin.py", "/home/bw-operator/template.py"]

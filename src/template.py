@@ -49,8 +49,35 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
     logger.info(f"Secret {secret_namespace}/{secret_name} has been created")
 
 @kopf.on.update('bitwarden-template.lerentis.uploadfilter24.eu')
-def my_handler(spec, old, new, diff, **_):
-    pass
+@kopf.timer('bitwarden-template.lerentis.uploadfilter24.eu', interval=900)
+def update_managed_secret(spec, status, name, namespace, logger, body, **kwargs):
+
+    template = spec.get('template')
+    filename = spec.get('filename')
+    secret_name = spec.get('name')
+    secret_namespace = spec.get('namespace')
+
+    unlock_bw(logger)
+
+    api = kubernetes.client.CoreV1Api()
+
+    annotations = {
+        "managed": "bitwarden-template.lerentis.uploadfilter24.eu",
+        "managedObject": f"{namespace}/{name}"
+    }
+    secret = kubernetes.client.V1Secret()
+    secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name, annotations=annotations)
+    secret = create_template_secret(secret, filename, template)
+
+    try:
+        obj = api.replace_namespaced_secret(
+            name=secret_name,
+            body=secret,
+            namespace="{}".format(secret_namespace))
+        logger.info(f"Secret {secret_namespace}/{secret_name} has been updated")
+    except:
+        logger.warn(
+            f"Could not update secret {secret_namespace}/{secret_name}!")
 
 @kopf.on.delete('bitwarden-template.lerentis.uploadfilter24.eu')
 def delete_managed_secret(spec, name, namespace, logger, **kwargs):
@@ -63,10 +90,3 @@ def delete_managed_secret(spec, name, namespace, logger, **kwargs):
         logger.info(f"Secret {secret_namespace}/{secret_name} has been deleted")
     except:
         logger.warn(f"Could not delete secret {secret_namespace}/{secret_name}!")
-
-#if __name__ == '__main__':
-#    tpl = """
-#        Calling the 'bitwarden_lookup' function:
-#        {{ bitwarden_lookup(2, 2) }}
-#    """
-#    print(render_template(tpl))

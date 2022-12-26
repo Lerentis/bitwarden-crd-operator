@@ -53,8 +53,39 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
     logger.info(f"Registry Secret {secret_namespace}/{secret_name} has been created")
 
 @kopf.on.update('registry-credential.lerentis.uploadfilter24.eu')
-def my_handler(spec, old, new, diff, **_):
-    pass
+@kopf.timer('registry-credential.lerentis.uploadfilter24.eu', interval=900)
+def update_managed_registry_secret(spec, status, name, namespace, logger, body, **kwargs):
+
+    username_ref = spec.get('usernameRef')
+    password_ref = spec.get('passwordRef')
+    registry = spec.get('registry')
+    id = spec.get('id')
+    secret_name = spec.get('name')
+    secret_namespace = spec.get('namespace')
+
+    unlock_bw(logger)
+    logger.info(f"Locking up secret with ID: {id}")
+    secret_json_object = json.loads(get_secret_from_bitwarden(id))
+
+    api = kubernetes.client.CoreV1Api()
+
+    annotations = {
+        "managed": "registry-credential.lerentis.uploadfilter24.eu",
+        "managedObject": f"{namespace}/{name}"
+    }
+    secret = kubernetes.client.V1Secret()
+    secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name, annotations=annotations)
+    secret = create_dockerlogin(logger, secret, secret_json_object, username_ref, password_ref, registry)
+    try:
+        obj = api.replace_namespaced_secret(
+            name=secret_name,
+            body=secret,
+            namespace="{}".format(secret_namespace))
+        logger.info(f"Secret {secret_namespace}/{secret_name} has been updated")
+    except:
+        logger.warn(
+            f"Could not update secret {secret_namespace}/{secret_name}!")
+
 
 @kopf.on.delete('registry-credential.lerentis.uploadfilter24.eu')
 def delete_managed_secret(spec, name, namespace, logger, **kwargs):
