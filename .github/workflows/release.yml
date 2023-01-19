@@ -65,4 +65,4 @@ jobs:
           file_glob: true
           file: lerentis-bitwarden-crd-operator_*.spdx.json
           tag:  ${{ steps.previoustag.outputs.tag }}
-          overwrite: false
+          overwrite: true
