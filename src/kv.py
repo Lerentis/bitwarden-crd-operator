@@ -19,11 +19,17 @@ def create_kv(secret, secret_json, content_def):
                 if key == "secretScope":
                     _secret_scope = value
             if _secret_scope == "login":
+                value = parse_login_scope(secret_json, _secret_key)
+                if value is None:
+                    raise Exception(f"Field {_secret_key} has no value in bitwarden secret")
                 secret.data[_secret_ref] = str(base64.b64encode(
-                    parse_login_scope(secret_json, _secret_key).encode("utf-8")), "utf-8")
+                    value.encode("utf-8")), "utf-8")
             if _secret_scope == "fields":
+                value = parse_fields_scope(secret_json, _secret_key)
+                if value is None:
+                    raise Exception(f"Field {_secret_key} has no value in bitwarden secret")
                 secret.data[_secret_ref] = str(base64.b64encode(
-                    parse_fields_scope(secret_json, _secret_key).encode("utf-8")), "utf-8")
+                    value.encode("utf-8")), "utf-8")
     return secret
 
 
