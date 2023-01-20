@@ -70,13 +70,17 @@ def update_managed_secret(spec, status, name, namespace, logger, body, **kwargs)
 
     content_def = body['spec']['content']
     id = spec.get('id')
-    old_config = json.loads(body.metadata.annotations['kopf.zalando.org/last-handled-configuration'])
-    old_secret_name = old_config['spec'].get('name')
-    old_secret_namespace = old_config['spec'].get('namespace')
+    old_config = None
+    old_secret_name = None
+    old_secret_namespace = None
+    if 'kopf.zalando.org/last-handled-configuration' in body.metadata.annotations:
+        old_config = json.loads(body.metadata.annotations['kopf.zalando.org/last-handled-configuration'])
+        old_secret_name = old_config['spec'].get('name')
+        old_secret_namespace = old_config['spec'].get('namespace')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
 
-    if old_secret_name != secret_name or old_secret_namespace != secret_namespace:
+    if old_config is not None and (old_secret_name != secret_name or old_secret_namespace != secret_namespace):
         # If the name of the secret or the namespace of the secret is different
         # We have to delete the secret an recreate it
         logger.info("Secret name or namespace changed, let's recreate it")
