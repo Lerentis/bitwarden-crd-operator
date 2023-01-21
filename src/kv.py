@@ -19,11 +19,17 @@ def create_kv(secret, secret_json, content_def):
                 if key == "secretScope":
                     _secret_scope = value
             if _secret_scope == "login":
+                value = parse_login_scope(secret_json, _secret_key)
+                if value is None:
+                    raise Exception(f"Field {_secret_key} has no value in bitwarden secret")
                 secret.data[_secret_ref] = str(base64.b64encode(
-                    parse_login_scope(secret_json, _secret_key).encode("utf-8")), "utf-8")
+                    value.encode("utf-8")), "utf-8")
             if _secret_scope == "fields":
+                value = parse_fields_scope(secret_json, _secret_key)
+                if value is None:
+                    raise Exception(f"Field {_secret_key} has no value in bitwarden secret")
                 secret.data[_secret_ref] = str(base64.b64encode(
-                    parse_fields_scope(secret_json, _secret_key).encode("utf-8")), "utf-8")
+                    value.encode("utf-8")), "utf-8")
     return secret
 
 
@@ -64,8 +70,23 @@ def update_managed_secret(spec, status, name, namespace, logger, body, **kwargs)
 
     content_def = body['spec']['content']
     id = spec.get('id')
+    old_config = None
+    old_secret_name = None
+    old_secret_namespace = None
+    if 'kopf.zalando.org/last-handled-configuration' in body.metadata.annotations:
+        old_config = json.loads(body.metadata.annotations['kopf.zalando.org/last-handled-configuration'])
+        old_secret_name = old_config['spec'].get('name')
+        old_secret_namespace = old_config['spec'].get('namespace')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
+
+    if old_config is not None and (old_secret_name != secret_name or old_secret_namespace != secret_namespace):
+        # If the name of the secret or the namespace of the secret is different
+        # We have to delete the secret an recreate it
+        logger.info("Secret name or namespace changed, let's recreate it")
+        delete_managed_secret(old_config['spec'], name, namespace, logger, **kwargs)
+        create_managed_secret(spec, name, namespace, logger, body, **kwargs)
+        return
 
     unlock_bw(logger)
     logger.info(f"Locking up secret with ID: {id}")
