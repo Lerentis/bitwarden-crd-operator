@@ -1,6 +1,7 @@
 import kopf
 import base64
 import kubernetes
+import json
 
 from utils.utils import unlock_bw
 from lookups.bitwarden_lookup import bitwarden_lookup
@@ -56,6 +57,24 @@ def update_managed_secret(spec, status, name, namespace, logger, body, **kwargs)
     filename = spec.get('filename')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
+
+    old_config = None
+    old_secret_name = None
+    old_secret_namespace = None
+    if 'kopf.zalando.org/last-handled-configuration' in body.metadata.annotations:
+        old_config = json.loads(body.metadata.annotations['kopf.zalando.org/last-handled-configuration'])
+        old_secret_name = old_config['spec'].get('name')
+        old_secret_namespace = old_config['spec'].get('namespace')
+    secret_name = spec.get('name')
+    secret_namespace = spec.get('namespace')
+
+    if old_config is not None and (old_secret_name != secret_name or old_secret_namespace != secret_namespace):
+        # If the name of the secret or the namespace of the secret is different
+        # We have to delete the secret an recreate it
+        logger.info("Secret name or namespace changed, let's recreate it")
+        delete_managed_secret(old_config['spec'], name, namespace, logger, **kwargs)
+        create_managed_secret(spec, name, namespace, logger, body, **kwargs)
+        return
 
     unlock_bw(logger)
 
