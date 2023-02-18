@@ -1,11 +1,9 @@
 # Bitwarden CRD Operator
 
-[![Build Status](https://drone.uploadfilter24.eu/api/badges/lerentis/bitwarden-crd-operator/status.svg?ref=refs/heads/main)](https://drone.uploadfilter24.eu/lerentis/bitwarden-crd-operator) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/lerentis)](https://artifacthub.io/packages/search?repo=lerentis)
-
 Bitwarden CRD Operator is a kubernetes Operator based on [kopf](https://github.com/nolar/kopf/). The goal is to create kubernetes native secret objects from bitwarden.
 
 <p align="center">
-  <img src="https://github.com/Lerentis/bitwarden-crd-operator/blob/main/logo.png?raw=true" alt="Bitwarden CRD Operator Logo" width="200"/>
+  <img src="https://github.com/OlympusGG/bitwarden-crd-operator/blob/main/logo.png?raw=true" alt="Bitwarden CRD Operator Logo" width="200"/>
 </p>
 
 > DISCLAIMER:  
@@ -44,7 +42,7 @@ the helm template will use all environment variables from this secret, so make s
 After that it is a basic helm deployment:
 
 ```bash
-helm repo add bitwarden-operator https://lerentis.github.io/bitwarden-crd-operator
+helm repo add bitwarden-operator https://olympusgg.github.io/bitwarden-crd-operator
 helm repo update 
 kubectl create namespace bw-operator
 helm upgrade --install --namespace bw-operator -f values.yaml bw-operator bitwarden-operator/bitwarden-crd-operator

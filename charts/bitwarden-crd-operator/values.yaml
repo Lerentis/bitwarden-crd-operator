@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: lerentis/bitwarden-crd-operator
+  repository: ghcr.io/olympusgg/bitwarden-crd-operator
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # tag: "0.1.0"
