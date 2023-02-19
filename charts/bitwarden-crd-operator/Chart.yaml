@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.5.1"
+version: "v0.5.2"
 
-appVersion: "0.5.1"
+appVersion: "0.5.2"
 
 keywords:
   - operator
@@ -94,14 +94,12 @@ annotations:
   artifacthub.io/license: MIT
   artifacthub.io/operator: "true"  
   artifacthub.io/changes: |
-    - kind: fixed
-      description: "Unlocking bitwarden only when needed"
     - kind: changed
-      description: "Allow switch of namespaces in CRDs"
-    - kind: fixed
-      description: "Handle none existing keys gracefully"
+      description: "Bump alpine from 3.17.1 to 3.17.2"
     - kind: changed
-      description: "Bump alpine minor release version"
+      description: "Bump bitwarden cli from 2022.11.0 to 2023.1.0"
+    - kind: changed
+      description: "Bump python version from 3.10.9-r1 to 3.10.10-r0"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: lerentis/bitwarden-crd-operator:0.5.1

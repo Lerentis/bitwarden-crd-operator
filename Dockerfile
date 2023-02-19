@@ -1,15 +1,15 @@
 FROM alpine:latest as builder
 
-ARG BW_VERSION=2022.11.0
+ARG BW_VERSION=2023.1.0
 
 RUN apk add wget unzip
 
 RUN cd /tmp && wget https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/bw-linux-${BW_VERSION}.zip && \
     unzip /tmp/bw-linux-${BW_VERSION}.zip
 
-FROM alpine:3.17.1
+FROM alpine:3.17.2
 
-ARG PYTHON_VERSION=3.10.9-r1
+ARG PYTHON_VERSION=3.10.10-r0
 ARG PIP_VERSION=22.3.1-r1
 ARG GCOMPAT_VERSION=1.1.0-r0
 
@@ -22,7 +22,7 @@ RUN set -eux; \
     mkdir -p /home/bw-operator; \
     chown -R bw-operator /home/bw-operator; \
     chmod +x /usr/local/bin/bw; \
-    apk add gcc musl-dev libstdc++ gcompat=${GCOMPAT_VERSION} python3=${PYTHON_VERSION} py-pip=${PIP_VERSION}; \
+    apk add gcc musl-dev libstdc++ gcompat=${GCOMPAT_VERSION} python3=${PYTHON_VERSION} py3-pip=${PIP_VERSION}; \
     pip install -r requirements.txt --no-warn-script-location; \
     apk del --purge gcc musl-dev libstdc++;
 
