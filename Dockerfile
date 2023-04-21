@@ -7,7 +7,7 @@ RUN apk add wget unzip
 RUN cd /tmp && wget https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/bw-linux-${BW_VERSION}.zip && \
     unzip /tmp/bw-linux-${BW_VERSION}.zip
 
-FROM alpine:3.17.2
+FROM alpine:3.17.3
 
 ARG PYTHON_VERSION=3.10.10-r0
 ARG PIP_VERSION=22.3.1-r1
