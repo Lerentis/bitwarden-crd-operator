@@ -46,7 +46,7 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
 
     unlock_bw(logger)
     logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = json.loads(get_secret_from_bitwarden(id))
+    secret_json_object = get_secret_from_bitwarden(logger, id)
 
     api = kubernetes.client.CoreV1Api()
 
@@ -118,7 +118,7 @@ def update_managed_registry_secret(
 
     unlock_bw(logger)
     logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = json.loads(get_secret_from_bitwarden(id))
+    secret_json_object = get_secret_from_bitwarden(logger, id)
 
     api = kubernetes.client.CoreV1Api()
 
