@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.5.3"
+version: "v0.5.4"
 
-appVersion: "0.5.3"
+appVersion: "0.5.4"
 
 keywords:
   - operator
@@ -95,9 +95,7 @@ annotations:
   artifacthub.io/operator: "true"  
   artifacthub.io/changes: |
     - kind: changed
-      description: "Bump kubernetes from 25.3.0 to 26.1.0"
-    - kind: fixed
-      description: "Fixed artifacthub images annotation"
+      description: "Bump Alpine base image from 3.17.2 to 3.17.3"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: lerentis/bitwarden-crd-operator:0.5.3
+      image: lerentis/bitwarden-crd-operator:0.5.4
