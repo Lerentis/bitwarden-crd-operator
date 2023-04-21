@@ -9,7 +9,7 @@ RUN cd /tmp && wget https://github.com/bitwarden/clients/releases/download/cli-v
 
 FROM alpine:3.17.3
 
-ARG PYTHON_VERSION=3.10.10-r0
+ARG PYTHON_VERSION=3.10.11-r0
 ARG PIP_VERSION=22.3.1-r1
 ARG GCOMPAT_VERSION=1.1.0-r0
 
