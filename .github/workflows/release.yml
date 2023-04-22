@@ -8,7 +8,9 @@ on:
 jobs:
   release:
     permissions:
+      id-token: write
       contents: write
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,7 +45,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: lerentis
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up QEMU
