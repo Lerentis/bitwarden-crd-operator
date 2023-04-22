@@ -4,6 +4,73 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
+          description: "Default image registry to ghcr.io and no longer docker hub. docker hub images will continue to be published"
+      artifacthub.io/crds: |
+        - kind: BitwardenSecret
+          version: v1beta4
+          name: bitwarden-secret
+          displayName: Bitwarden Secret
+          description: Management Object to create secrets from bitwarden
+        - kind: RegistryCredential
+          version: v1beta4
+          name: registry-credential
+          displayName: Regestry Credentials
+          description: Management Object to create regestry secrets from bitwarden
+        - kind: BitwardenTemplate
+          version: v1beta1
+          name: bitwarden-template
+          displayName: Bitwarden Template
+          description: Management Object to create secrets from a jinja template with a bitwarden lookup
+      artifacthub.io/crdsExamples: "- apiVersion: lerentis.uploadfilter24.eu/v1beta4\n
+        \ kind: BitwardenSecret\n  metadata:\n    name: test\n  spec:\n    content:\n
+        \     - element:\n          secretName: username\n          secretRef: nameofUser
+        \n      - element:\n          secretName: password\n          secretRef: passwordOfUser
+        \n    id: \"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\"\n    name: \"test-secret\"\n
+        \   namespace: \"default\"\n- apiVersion: lerentis.uploadfilter24.eu/v1beta4\n
+        \ kind: RegistryCredential\n  metadata:\n    name: test\n  spec:\n    usernameRef:
+        \"username\"\n    passwordRef: \"password\"\n    registry: \"docker.io\"\n
+        \   id: \"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\"\n    name: \"test-regcred\"\n
+        \   namespace: \"default\"\n- apiVersion: \"lerentis.uploadfilter24.eu/v1beta4\"\n
+        \ kind: BitwardenTemplate\n  metadata:\n    name: test\n  spec:\n    filename:
+        \"config.yaml\"\n    name: \"test-regcred\"\n    namespace: \"default\"\n
+        \   template: |\n      ---\n      api:\n        enabled: True\n        key:
+        {{ bitwarden_lookup(\"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\", \"fields\",
+        \"key\") }}\n        allowCrossOrigin: false\n        apps:\n          \"some.app.identifier:some_version\":\n
+        \           pubkey: {{ bitwarden_lookup(\"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\",
+        \"fields\", \"public_key\") }}\n            enabled: true  \n"
+      artifacthub.io/images: |
+        - name: bitwarden-crd-operator
+          image: ghcr.io/lerentis/bitwarden-crd-operator:0.5.4
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/Lerentis/bitwarden-crd-operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: 0.5.4
+    created: "2023-04-22T13:18:17.08191551Z"
+    description: Deploy the Bitwarden CRD Operator
+    digest: 5dc85a3a94e82f9f3b623ca9477389f6e7f9416e75dae17e2b5c01b92ecb6d4b
+    home: https://lerentis.github.io/bitwarden-crd-operator/
+    icon: https://lerentis.github.io/bitwarden-crd-operator/logo.png
+    keywords:
+    - operator
+    - bitwarden
+    - vaultwarden
+    kubeVersion: '>= 1.23.0-0'
+    maintainers:
+    - email: lerentis+helm@uploadfilter24.eu
+      name: lerentis
+    name: bitwarden-crd-operator
+    sources:
+    - https://github.com/Lerentis/bitwarden-crd-operator
+    type: application
+    urls:
+    - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.6.0/bitwarden-crd-operator-v0.6.0.tgz
+    version: v0.6.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
           description: "Bump Alpine base image from 3.17.2 to 3.17.3"
       artifacthub.io/crds: |
         - kind: BitwardenSecret
@@ -852,4 +919,4 @@ entries:
     urls:
     - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.2.0/bitwarden-crd-operator-v0.2.0.tgz
     version: v0.2.0
-generated: "2023-04-21T14:00:53.062734567Z"
+generated: "2023-04-22T13:18:17.082135912Z"
