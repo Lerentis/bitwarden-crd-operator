@@ -9,6 +9,10 @@ RUN cd /tmp && wget https://github.com/bitwarden/clients/releases/download/cli-v
 
 FROM alpine:3.17.3
 
+LABEL org.opencontainers.image.source=https://github.com/Lerentis/bitwarden-crd-operator
+LABEL org.opencontainers.image.description="Kubernetes Operator to create k8s secrets from bitwarden"
+LABEL org.opencontainers.image.licenses=MIT
+
 ARG PYTHON_VERSION=3.10.11-r0
 ARG PIP_VERSION=22.3.1-r1
 ARG GCOMPAT_VERSION=1.1.0-r0
