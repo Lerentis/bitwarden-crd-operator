@@ -52,12 +52,12 @@ jobs:
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ github.actor }}/bitwarden-crd-operator:${{ steps.app_version.outputs.result }}
+          tags: ghcr.io/lerentis/bitwarden-crd-operator:${{ steps.app_version.outputs.result }}
 
       - name: Create SBOM
         uses: anchore/sbom-action@v0
         with:
-          image: ghcr.io/${{ github.actor }}/bitwarden-crd-operator:${{ steps.app_version.outputs.result }}
+          image: ghcr.io/lerentis/bitwarden-crd-operator:${{ steps.app_version.outputs.result }}
         
       - name: Publish SBOM
         uses: anchore/sbom-action/publish-sbom@v0
