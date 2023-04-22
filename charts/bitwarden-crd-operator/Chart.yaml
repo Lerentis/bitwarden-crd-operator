@@ -4,7 +4,7 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.5.4"
+version: "v0.6.0"
 
 appVersion: "0.5.4"
 
@@ -95,7 +95,7 @@ annotations:
   artifacthub.io/operator: "true"  
   artifacthub.io/changes: |
     - kind: changed
-      description: "Bump Alpine base image from 3.17.2 to 3.17.3"
+      description: "Default image registry to ghcr.io and no longer docker hub. docker hub images will continue to be published"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: lerentis/bitwarden-crd-operator:0.5.4
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.5.4
