@@ -60,7 +60,7 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
     secret = create_dockerlogin(
         logger,
         secret,
-        secret_json_object,
+        secret_json_object["data"],
         username_ref,
         password_ref,
         registry)
@@ -132,7 +132,7 @@ def update_managed_registry_secret(
     secret = create_dockerlogin(
         logger,
         secret,
-        secret_json_object,
+        secret_json_object["data"],
         username_ref,
         password_ref,
         registry)
