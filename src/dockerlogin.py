@@ -40,7 +40,6 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
     username_ref = spec.get('usernameRef')
     password_ref = spec.get('passwordRef')
     registry = spec.get('registry')
-    id = spec.get('id')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
 
@@ -117,8 +116,7 @@ def update_managed_registry_secret(
         return
 
     unlock_bw(logger)
-    logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = get_secret_from_bitwarden(logger, id)
+    secret_json_object = get_secret_from_bitwarden(logger, spec)
 
     api = kubernetes.client.CoreV1Api()
 

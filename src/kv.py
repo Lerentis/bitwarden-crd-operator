@@ -39,13 +39,11 @@ def create_kv(secret, secret_json, content_def):
 def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
     content_def = body['spec']['content']
-    id = spec.get('id')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
 
     unlock_bw(logger)
-    logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = get_secret_from_bitwarden(logger, id)
+    secret_json_object = get_secret_from_bitwarden(logger, spec)
 
     api = kubernetes.client.CoreV1Api()
 
@@ -53,9 +51,19 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
         "managed": "bitwarden-secret.lerentis.uploadfilter24.eu",
         "managedObject": f"{namespace}/{name}"
     }
+
+    owner_reference = {
+        "apiVersion": body["apiVersion"],
+        "blockOwnerDeletion": True,
+        "controller": True,
+        "kind": body["kind"],
+        "name": body['metadata']["name"],
+        "uid": body['metadata']["uid"],
+    }
+
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations)
+        name=secret_name, annotations=annotations, owner_references=[owner_reference])
     secret = create_kv(secret, secret_json_object, content_def)
 
     obj = api.create_namespaced_secret(
@@ -78,7 +86,6 @@ def update_managed_secret(
         **kwargs):
 
     content_def = body['spec']['content']
-    id = spec.get('id')
     old_config = None
     old_secret_name = None
     old_secret_namespace = None
@@ -105,8 +112,7 @@ def update_managed_secret(
         return
 
     unlock_bw(logger)
-    logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = get_secret_from_bitwarden(logger, id)
+    secret_json_object = get_secret_from_bitwarden(logger, spec)
 
     api = kubernetes.client.CoreV1Api()
 

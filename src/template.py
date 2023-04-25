@@ -4,12 +4,13 @@ import kubernetes
 import json
 
 from utils.utils import unlock_bw
-from lookups.bitwarden_lookup import bitwarden_lookup
+from lookups.bitwarden_lookup import bitwarden_lookup, bitwarden_lookup_with_name
 from jinja2 import Environment, BaseLoader
 
 
 lookup_func_dict = {
     "bitwarden_lookup": bitwarden_lookup,
+    "bitwarden_lookup_with_name": bitwarden_lookup_with_name,
 }
 
 
