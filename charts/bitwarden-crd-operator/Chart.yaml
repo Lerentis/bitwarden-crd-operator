@@ -95,7 +95,7 @@ annotations:
   artifacthub.io/operator: "true"  
   artifacthub.io/changes: |
     - kind: changed
-      description: "Default image registry to ghcr.io and no longer docker hub. docker hub images will continue to be published"
+      description: "Use JSON output mode (--response) of Bitwarden CLI."
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: ghcr.io/lerentis/bitwarden-crd-operator:0.5.4
