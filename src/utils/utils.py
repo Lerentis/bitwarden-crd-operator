@@ -46,7 +46,7 @@ def parse_login_scope(secret_json, key):
 
 
 def parse_fields_scope(secret_json, key):
-    if "fields" not in secret_json:
+    if "fields" not in secret_json["data"]:
         return None
     for entry in secret_json["data"]["fields"]:
         if entry['name'] == key:

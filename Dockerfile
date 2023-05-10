@@ -16,6 +16,7 @@ LABEL org.opencontainers.image.licenses=MIT
 ARG PYTHON_VERSION=3.10.11-r0
 ARG PIP_VERSION=22.3.1-r1
 ARG GCOMPAT_VERSION=1.1.0-r0
+ARG LIBCRYPTO_VERSION=3.0.8-r4
 
 COPY --from=builder /tmp/bw /usr/local/bin/bw
 COPY requirements.txt requirements.txt
@@ -26,7 +27,7 @@ RUN set -eux; \
     mkdir -p /home/bw-operator; \
     chown -R bw-operator /home/bw-operator; \
     chmod +x /usr/local/bin/bw; \
-    apk add gcc musl-dev libstdc++ gcompat=${GCOMPAT_VERSION} python3=${PYTHON_VERSION} py3-pip=${PIP_VERSION}; \
+    apk add gcc musl-dev libstdc++ gcompat=${GCOMPAT_VERSION} python3=${PYTHON_VERSION} py3-pip=${PIP_VERSION} libcrypto3=${LIBCRYPTO_VERSION} libssl3=${LIBCRYPTO_VERSION}; \
     pip install -r requirements.txt --no-warn-script-location; \
     apk del --purge gcc musl-dev libstdc++;
 
