@@ -20,7 +20,7 @@ home: https://lerentis.github.io/bitwarden-crd-operator/
 sources:
   - https://github.com/Lerentis/bitwarden-crd-operator
 
-kubeVersion: '>= 1.23.0-0'
+kubeVersion: ">= 1.23.0-0"
 
 maintainers:
   - name: lerentis
@@ -55,10 +55,10 @@ annotations:
         content:
           - element:
               secretName: username
-              secretRef: nameofUser 
+              secretRef: nameofUser
           - element:
               secretName: password
-              secretRef: passwordOfUser 
+              secretRef: passwordOfUser
         id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
         name: "test-secret"
         namespace: "default"
@@ -90,9 +90,9 @@ annotations:
             apps:
               "some.app.identifier:some_version":
                 pubkey: {{ bitwarden_lookup("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "fields", "public_key") }}
-                enabled: true  
+                enabled: true
   artifacthub.io/license: MIT
-  artifacthub.io/operator: "true"  
+  artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: fixed
