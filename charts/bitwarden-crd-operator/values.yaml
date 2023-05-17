@@ -14,15 +14,15 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-#env:
-#  - name: BW_HOST
-#    value: "define_it"
-#  - name: BW_CLIENTID
-#    value: "define_it"
-#  - name: BW_CLIENTSECRET
-#    value: "define_it"
-#  - name: BW_PASSWORD
-#    value: "define_id"
+# env:
+#   - name: BW_HOST
+#     value: "define_it"
+#   - name: BW_CLIENTID
+#     value: "define_it"
+#   - name: BW_CLIENTSECRET
+#     value: "define_it"
+#   - name: BW_PASSWORD
+#     value: "define_id"
 
 externalConfigSecret:
   enabled: false
