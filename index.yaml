@@ -3,6 +3,102 @@ entries:
   bitwarden-crd-operator:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: "Update Alpine and other dependencies"
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/crds: |
+        - kind: BitwardenSecret
+          version: v1beta4
+          name: bitwarden-secret
+          displayName: Bitwarden Secret
+          description: Management Object to create secrets from bitwarden
+        - kind: RegistryCredential
+          version: v1beta4
+          name: registry-credential
+          displayName: Regestry Credentials
+          description: Management Object to create regestry secrets from bitwarden
+        - kind: BitwardenTemplate
+          version: v1beta1
+          name: bitwarden-template
+          displayName: Bitwarden Template
+          description: Management Object to create secrets from a jinja template with a bitwarden lookup
+      artifacthub.io/crdsExamples: |
+        - apiVersion: lerentis.uploadfilter24.eu/v1beta4
+          kind: BitwardenSecret
+          metadata:
+            name: test
+          spec:
+            content:
+              - element:
+                  secretName: username
+                  secretRef: nameofUser
+              - element:
+                  secretName: password
+                  secretRef: passwordOfUser
+            id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+            name: "test-secret"
+            namespace: "default"
+        - apiVersion: lerentis.uploadfilter24.eu/v1beta4
+          kind: RegistryCredential
+          metadata:
+            name: test
+          spec:
+            usernameRef: "username"
+            passwordRef: "password"
+            registry: "docker.io"
+            id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+            name: "test-regcred"
+            namespace: "default"
+        - apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+          kind: BitwardenTemplate
+          metadata:
+            name: test
+          spec:
+            filename: "config.yaml"
+            name: "test-regcred"
+            namespace: "default"
+            template: |
+              ---
+              api:
+                enabled: True
+                key: {{ bitwarden_lookup("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "fields", "key") }}
+                allowCrossOrigin: false
+                apps:
+                  "some.app.identifier:some_version":
+                    pubkey: {{ bitwarden_lookup("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "fields", "public_key") }}
+                    enabled: true
+      artifacthub.io/images: |
+        - name: bitwarden-crd-operator
+          image: ghcr.io/lerentis/bitwarden-crd-operator:0.6.3
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/Lerentis/bitwarden-crd-operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: 0.6.3
+    created: "2023-05-31T08:18:20.427093607Z"
+    description: Deploy the Bitwarden CRD Operator
+    digest: 7572fdd3760a482d956e546670c3f573c7e5afd2c4ed2e9d2e6a8579cb6540db
+    home: https://lerentis.github.io/bitwarden-crd-operator/
+    icon: https://lerentis.github.io/bitwarden-crd-operator/logo.png
+    keywords:
+    - operator
+    - bitwarden
+    - vaultwarden
+    kubeVersion: '>= 1.23.0-0'
+    maintainers:
+    - email: lerentis+helm@uploadfilter24.eu
+      name: lerentis
+    name: bitwarden-crd-operator
+    sources:
+    - https://github.com/Lerentis/bitwarden-crd-operator
+    type: application
+    urls:
+    - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.7.3/bitwarden-crd-operator-v0.7.3.tgz
+    version: v0.7.3
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: "Fallback to npm package on ARM as native bitwarden cli package is not compatible with ARM"
       artifacthub.io/containsSecurityUpdates: "false"
@@ -1152,4 +1248,4 @@ entries:
     urls:
     - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.2.0/bitwarden-crd-operator-v0.2.0.tgz
     version: v0.2.0
-generated: "2023-05-17T10:41:48.081111663Z"
+generated: "2023-05-31T08:18:20.427371509Z"
