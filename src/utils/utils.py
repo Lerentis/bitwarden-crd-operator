@@ -32,9 +32,9 @@ def command_wrapper(logger, command, use_success: bool = True):
         shell=True,
         env=system_env)
     out, err = sp.communicate()
-    resp = json.loads(out.decode(encoding='UTF-8'))
     if "DEBUG" in system_env:
-        logger.info(resp)
+        logger.info(out.decode(encoding='UTF-8'))
+    resp = json.loads(out.decode(encoding='UTF-8'))
     if resp["success"] != None and (not use_success or (use_success and resp["success"] == True)):
         return resp
     logger.warn(resp)
