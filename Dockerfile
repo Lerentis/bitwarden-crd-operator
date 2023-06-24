@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.source=https://github.com/Lerentis/bitwarden-crd-
 LABEL org.opencontainers.image.description="Kubernetes Operator to create k8s secrets from bitwarden"
 LABEL org.opencontainers.image.licenses=MIT
 
-ARG PYTHON_VERSION=3.11.3-r11
+ARG PYTHON_VERSION=3.11.4-r0
 ARG PIP_VERSION=23.1.2-r0
 ARG GCOMPAT_VERSION=1.1.0-r1
 ARG LIBCRYPTO_VERSION=3.1.0-r4
@@ -24,6 +24,8 @@ RUN set -eux; \
           cd /tmp; \
           wget https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/bw-linux-${BW_VERSION}.zip; \
           unzip /tmp/bw-linux-${BW_VERSION}.zip; \
+          mv /tmp/bw /usr/local/bin/bw; \
+          chmod +x /usr/local/bin/bw; \
          ;; \
        *) \
          echo "Unsupported arch: ${ARCH}"; \
