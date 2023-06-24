@@ -166,3 +166,5 @@ lib
 lib64
 
 myvalues.yaml
+
+.vscode
