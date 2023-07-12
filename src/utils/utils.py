@@ -8,7 +8,13 @@ class BitwardenCommandException(Exception):
 
 
 def get_secret_from_bitwarden(logger, id):
+    sync_bw(logger)
     return command_wrapper(logger, command=f"get item {id}")
+
+
+def sync_bw(logger):
+    status_output = command_wrapper(logger, command=f"sync")
+    logger.info(f"Sync successful {status_output}")
 
 
 def unlock_bw(logger):
