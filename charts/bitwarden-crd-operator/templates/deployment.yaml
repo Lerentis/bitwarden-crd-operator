@@ -59,7 +59,6 @@ spec:
             httpGet:
               path: /healthz
               port: http
-              scheme: HTTP
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
