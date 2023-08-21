@@ -95,7 +95,7 @@ annotations:
   artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: feat
+    - kind: added
       description: "Added prob variables for helm"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
