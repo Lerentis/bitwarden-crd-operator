@@ -42,7 +42,7 @@ jobs:
           cmd: yq '.appVersion' charts/bitwarden-crd-operator/Chart.yaml
 
       - name: "GHCR Login"
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: lerentis
