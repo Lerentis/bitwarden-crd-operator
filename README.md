@@ -171,6 +171,11 @@ type: Opaque
 
 please note that the rendering engine for this template is jinja2, with an addition of a custom `bitwarden_lookup` function, so there are more possibilities to inject here.
 
+## Configurations parameters
+
+The operator uses the bitwarden cli in the background and does not communicate to the api directly. The cli mirrors the credential store locally but doesn't sync it on every get request. Instead it will sync each secret every 15 minutes (900 seconds). You can adjust the interval by setting `BW_SYNC_INTERVAL` in the values. If you're secrets update very very frequently, you can force the operator to do a sync before each get by setting `BW_FORCE_SYNC="true"`. You might run into rate limits if you do this too frequent.
+
+
 ## Short Term Roadmap
 
 - [ ] support more types
