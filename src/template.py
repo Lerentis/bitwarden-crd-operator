@@ -4,27 +4,24 @@ import kubernetes
 import json
 
 from utils.utils import unlock_bw, bw_sync_interval
-from lookups.bitwarden_lookup import bitwarden_lookup
+from lookups.bitwarden_lookup import BitwardenLookupHandler
 from jinja2 import Environment, BaseLoader
 
 
-lookup_func_dict = {
-    "bitwarden_lookup": bitwarden_lookup,
-}
-
-
-def render_template(template):
+def render_template(logger, template):
     jinja_template = Environment(loader=BaseLoader()).from_string(template)
-    jinja_template.globals.update(lookup_func_dict)
+    jinja_template.globals.update({
+        "bitwarden_lookup": BitwardenLookupHandler(logger).bitwarden_lookup,
+    })
     return jinja_template.render()
 
 
-def create_template_secret(secret, filename, template):
+def create_template_secret(logger, secret, filename, template):
     secret.type = "Opaque"
     secret.data = {}
     secret.data[filename] = str(
         base64.b64encode(
-            render_template(template).encode("utf-8")),
+            render_template(logger, template).encode("utf-8")),
         "utf-8")
     return secret
 
@@ -48,7 +45,7 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(
         name=secret_name, annotations=annotations)
-    secret = create_template_secret(secret, filename, template)
+    secret = create_template_secret(logger, secret, filename, template)
 
     obj = api.create_namespaced_secret(
         secret_namespace, secret
@@ -109,7 +106,7 @@ def update_managed_secret(
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(
         name=secret_name, annotations=annotations)
-    secret = create_template_secret(secret, filename, template)
+    secret = create_template_secret(logger, secret, filename, template)
 
     try:
         obj = api.replace_namespaced_secret(
