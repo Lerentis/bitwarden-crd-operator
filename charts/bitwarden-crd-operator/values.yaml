@@ -15,6 +15,10 @@ nameOverride: ""
 fullnameOverride: ""
 
 # env:
+#   - name: BW_FORCE_SYNC
+#     value: "false"
+#   - name: BW_SYNC_INTERVAL
+#     value: "900"
 #   - name: BW_HOST
 #     value: "define_it"
 #   - name: BW_CLIENTID

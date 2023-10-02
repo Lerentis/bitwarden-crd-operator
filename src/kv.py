@@ -3,8 +3,7 @@ import kubernetes
 import base64
 import json
 
-from utils.utils import unlock_bw, get_secret_from_bitwarden, parse_login_scope, parse_fields_scope
-
+from utils.utils import unlock_bw, get_secret_from_bitwarden, parse_login_scope, parse_fields_scope, bw_sync_interval
 
 def create_kv(secret, secret_json, content_def):
     secret.type = "Opaque"
@@ -67,7 +66,7 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
 
 @kopf.on.update('bitwarden-secret.lerentis.uploadfilter24.eu')
-@kopf.timer('bitwarden-secret.lerentis.uploadfilter24.eu', interval=900)
+@kopf.timer('bitwarden-secret.lerentis.uploadfilter24.eu', interval=bw_sync_interval)
 def update_managed_secret(
         spec,
         status,

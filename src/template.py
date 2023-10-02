@@ -3,7 +3,7 @@ import base64
 import kubernetes
 import json
 
-from utils.utils import unlock_bw
+from utils.utils import unlock_bw, bw_sync_interval
 from lookups.bitwarden_lookup import bitwarden_lookup
 from jinja2 import Environment, BaseLoader
 
@@ -58,7 +58,7 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
 
 @kopf.on.update('bitwarden-template.lerentis.uploadfilter24.eu')
-@kopf.timer('bitwarden-template.lerentis.uploadfilter24.eu', interval=900)
+@kopf.timer('bitwarden-template.lerentis.uploadfilter24.eu', interval=bw_sync_interval)
 def update_managed_secret(
         spec,
         status,

@@ -3,7 +3,7 @@ import kubernetes
 import base64
 import json
 
-from utils.utils import unlock_bw, get_secret_from_bitwarden
+from utils.utils import unlock_bw, get_secret_from_bitwarden, bw_sync_interval
 
 
 def create_dockerlogin(
@@ -74,7 +74,7 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
 
 
 @kopf.on.update('registry-credential.lerentis.uploadfilter24.eu')
-@kopf.timer('registry-credential.lerentis.uploadfilter24.eu', interval=900)
+@kopf.timer('registry-credential.lerentis.uploadfilter24.eu', interval=bw_sync_interval)
 def update_managed_registry_secret(
         spec,
         status,
