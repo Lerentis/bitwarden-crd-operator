@@ -40,7 +40,7 @@ def sync_bw(logger, force=False):
 
 
 def get_attachment(logger, id, name):
-    return command_wrapper(logger, command=f"get attachment {name} {id}", raw=True)
+    return command_wrapper(logger, command=f"get attachment {name} --itemid {id}", raw=True)
 
 
 def unlock_bw(logger):
