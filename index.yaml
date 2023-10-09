@@ -7,7 +7,7 @@ entries:
           description: "Unified scheduled none crd related operations (bw sync and login)"
         - kind: added
           description: "Added relogin interval which can be finetuned with env `BW_RELOGIN_INTERVAL`. defaults to 3600 seconds"
-        - kind: chanced
+        - kind: changed
           description: "Updated python to 3.11.6-r0"
       artifacthub.io/containsSecurityUpdates: "false"
       artifacthub.io/crds: |
