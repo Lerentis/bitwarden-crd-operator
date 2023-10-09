@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.8.0"
+version: "v0.9.0"
 
-appVersion: "0.7.0"
+appVersion: "0.8.0"
 
 keywords:
   - operator
@@ -96,9 +96,11 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
-      description: "Take care to sync with bitwarden before getting a secret, added BW_SYNC_INTERVAL and BW_FORCE_SYNC envs to control sync."
-    - kind: fixed
-      description: "Downgrade bitwarden cli due to segfault on newer versions"
+      description: "Unified scheduled none crd related operations (bw sync and login)"
+    - kind: added
+      description: "Added relogin interval which can be finetuned with env `BW_RELOGIN_INTERVAL`. defaults to 3600 seconds"
+    - kind: chanced
+      description: "Updated python to 3.11.6-r0"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: ghcr.io/lerentis/bitwarden-crd-operator:0.7.0
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.8.0

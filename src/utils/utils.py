@@ -2,10 +2,6 @@ import os
 import json
 import subprocess
 import distutils
-from datetime import datetime, timezone, timedelta
-from dateutil import parser
-from dateutil.tz import tzutc
-tzinfos = {"CDT": tzutc()}
 
 bw_sync_interval = float(os.environ.get(
     'BW_SYNC_INTERVAL', 900))
@@ -30,42 +26,17 @@ def sync_bw(logger, force=False):
         _sync(logger)
         return
 
-    last_sync = last_sync_bw(logger)
-    now = datetime.now(tzutc())
-    sync_interval = timedelta(seconds=bw_sync_interval)
-    bw_is_out_of_sync_inverval = (now - last_sync) >= sync_interval
     global_force_sync = bool(distutils.util.strtobool(
         os.environ.get('BW_FORCE_SYNC', "false")))
-    needs_sync = force or global_force_sync or bw_is_out_of_sync_inverval
-    logger.debug(f"last_sync: {last_sync}")
-    logger.debug(
-        f"force: {force}, global_force_sync: {global_force_sync}, bw_is_out_of_sync_inverval: {bw_is_out_of_sync_inverval}, needs_sync: {needs_sync}")
 
-    if needs_sync:
+    if global_force_sync:
+        logger.debug("Running forced sync")
         status_output = _sync(logger)
         logger.info(f"Sync successful {status_output}")
-
-
-def last_sync_bw(logger):
-    null_datetime_string = "0001-01-01T00:00:00.000Z"
-
-    # retruns: {"success":true,"data":{"object":"string","data":"2023-09-22T13:50:09.995Z"}}
-    last_sync_output = command_wrapper(
-        logger, command="sync --last", use_success=False)
-
-    # if not last_sync_output:
-    #     return parser.parse(null_datetime_string, tzinfos=tzinfos)
-
-    if not last_sync_output or not last_sync_output.get("success"):
-        logger.error("Error getting last sync time.")
-        return parser.parse(null_datetime_string, tzinfos=tzinfos)
-
-    # in case no sync was done yet, null is returned from api
-    # use some long ago date...
-    last_sync_string = last_sync_output.get(
-        "data").get("data", null_datetime_string)
-    last_sync = parser.parse(last_sync_string, tzinfos=tzinfos)
-    return last_sync
+    else:
+        logger.debug("Running scheduled sync")
+        status_output = _sync(logger)
+        logger.info(f"Sync successful {status_output}")
 
 
 def unlock_bw(logger):
