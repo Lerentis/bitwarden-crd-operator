@@ -27,6 +27,8 @@ fullnameOverride: ""
 #     value: "define_it"
 #   - name: BW_PASSWORD
 #     value: "define_id"
+##  - name: BW_RELOGIN_INTERVAL
+##    value: "3600"
 
 externalConfigSecret:
   enabled: false

@@ -173,13 +173,6 @@ please note that the rendering engine for this template is jinja2, with an addit
 
 ## Configurations parameters
 
-The operator uses the bitwarden cli in the background and does not communicate to the api directly. The cli mirrors the credential store locally but doesn't sync it on every get request. Instead it will sync each secret every 15 minutes (900 seconds). You can adjust the interval by setting `BW_SYNC_INTERVAL` in the values. If you're secrets update very very frequently, you can force the operator to do a sync before each get by setting `BW_FORCE_SYNC="true"`. You might run into rate limits if you do this too frequent.
+The operator uses the bitwarden cli in the background and does not communicate to the api directly. The cli mirrors the credential store locally but doesn't sync it on every get request. Instead it will sync each secret every 15 minutes (900 seconds). You can adjust the interval by setting `BW_SYNC_INTERVAL` in the values. If your secrets update very very frequently, you can force the operator to do a sync before each get by setting `BW_FORCE_SYNC="true"`. You might run into rate limits if you do this too frequent.
 
-
-## Short Term Roadmap
-
-- [ ] support more types
-- [x] offer option to use a existing secret in helm chart
-- [x] host chart on gh pages
-- [x] write release pipeline
-- [x] maybe extend spec to offer modification of keys as well
+Additionally the bitwarden cli session may expire at some time. In order to create a new session, the login command is triggered from time to time. In what interval exactly can be configured with the env `BW_RELOGIN_INTERVAL` which defaults to 3600s.
