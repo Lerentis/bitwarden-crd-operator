@@ -39,6 +39,10 @@ def sync_bw(logger, force=False):
         logger.info(f"Sync successful {status_output}")
 
 
+def get_attachment(logger, id, name):
+    return command_wrapper(logger, command=f"get attachment {name} --itemid {id}", raw=True)
+
+
 def unlock_bw(logger):
     status_output = command_wrapper(logger, "status", False)
     status = status_output['data']['template']['status']
@@ -50,17 +54,22 @@ def unlock_bw(logger):
     logger.info("Signin successful. Session exported")
 
 
-def command_wrapper(logger, command, use_success: bool = True):
+def command_wrapper(logger, command, use_success: bool = True, raw: bool = False):
     system_env = dict(os.environ)
+    response_flag = "--raw" if raw else "--response"
     sp = subprocess.Popen(
-        [f"bw --response {command}"],
+        [f"bw {response_flag} {command}"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         close_fds=True,
         shell=True,
         env=system_env)
     out, err = sp.communicate()
-
+    if err:
+        logger.warn(err)
+        return None
+    if raw:
+        return out.decode(encoding='UTF-8')
     if "DEBUG" in system_env:
         logger.info(out.decode(encoding='UTF-8'))
     resp = json.loads(out.decode(encoding='UTF-8'))
