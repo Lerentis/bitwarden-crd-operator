@@ -129,7 +129,7 @@ type: dockerconfigjson
 
 ## BitwardenTemplate
 
-One of the more freely defined types that can be used with this operator you can just pass a whole template:
+One of the more freely defined types that can be used with this operator you can just pass a whole template. Also the lookup function `bitwarden_lookup` is available to reference parts of the secret:
 
 ```yaml
 ---
@@ -145,11 +145,11 @@ spec:
     ---
     api:
       enabled: True
-      key: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields", "name of a field in bitwarden") }}
+      key: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
       allowCrossOrigin: false
       apps:
         "some.app.identifier:some_version":
-          pubkey: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields", "name of a field in bitwarden") }}
+          pubkey: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
           enabled: true
 ```
 
@@ -169,7 +169,15 @@ metadata:
 type: Opaque
 ```
 
-please note that the rendering engine for this template is jinja2, with an addition of a custom `bitwarden_lookup` function, so there are more possibilities to inject here.
+The signature of `bitwarden_lookup` is `(item_id, scope, field)`:
+- `item_id`: The item ID of the secret in Bitwarden
+- `scope`: one of `login`, `fields` or `attachment`
+- `field`:
+  - when `scope` is `login`: either `username` or `password`
+  - when `scope` is `fields`: the name of a custom field
+  - when `scope` is `attachment`: the filename of a file attached to the item
+
+Please note that the rendering engine for this template is jinja2, with an addition of a custom `bitwarden_lookup` function, so there are more possibilities to inject here.
 
 ## Configurations parameters
 
