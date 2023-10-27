@@ -13,7 +13,7 @@ def create_dockerlogin(
         username_ref,
         password_ref,
         registry):
-    secret.type = "dockerconfigjson"
+    secret.type = "kubernetes.io/dockerconfigjson"
     secret.data = {}
     auths_dict = {}
     registry_dict = {}
@@ -26,7 +26,8 @@ def create_dockerlogin(
         base64.b64encode(
             f"{_username}:{_password}".encode("utf-8")),
         "utf-8")
-
+    reg_auth_dict["username"] = _username
+    reg_auth_dict["password"] = _password
     reg_auth_dict["auth"] = cred_field
     registry_dict[registry] = reg_auth_dict
     auths_dict["auths"] = registry_dict
