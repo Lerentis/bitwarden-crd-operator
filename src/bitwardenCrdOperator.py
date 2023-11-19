@@ -4,8 +4,9 @@ import kopf
 import schedule
 import time
 import threading
+import logging
 
-from utils.utils import command_wrapper, unlock_bw, sync_bw
+from utils.utils import command_wrapper, unlock_bw, sync_bw, ERROR_COUNT
 
 def bitwarden_signin(logger, **kwargs):
     if 'BW_HOST' in os.environ:
@@ -36,6 +37,7 @@ def run_continuously(interval=30):
 
 @kopf.on.startup()
 def load_schedules(logger, **kwargs):
+    logging.getLogger('aiohttp.access').setLevel(logging.ERROR)
     bitwarden_signin(logger)
     logger.info("Loading schedules")
     bw_relogin_interval = float(os.environ.get('BW_RELOGIN_INTERVAL', 3600))
@@ -45,3 +47,8 @@ def load_schedules(logger, **kwargs):
     schedule.every(bw_sync_interval).seconds.do(sync_bw, logger=logger)
     logger.info(f"sync scheduled every {bw_relogin_interval} seconds")
     stop_run_continuously = run_continuously()
+
+@kopf.on.probe()
+def healthcheck(**kwargs):
+    if ERROR_COUNT != 0:
+        return ERROR_COUNT

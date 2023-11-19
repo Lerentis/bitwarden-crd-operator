@@ -6,6 +6,8 @@ import distutils
 bw_sync_interval = float(os.environ.get(
     'BW_SYNC_INTERVAL', 900))
 
+ERROR_COUNT = 0
+
 class BitwardenCommandException(Exception):
     pass
 
@@ -50,6 +52,9 @@ def unlock_bw(logger):
         logger.info("Already unlocked")
         return
     token_output = command_wrapper(logger, "unlock --passwordenv BW_PASSWORD")
+    if token_output == None:
+        global ERROR_COUNT
+        ERROR_COUNT = ERROR_COUNT+1
     os.environ["BW_SESSION"] = token_output["data"]["raw"]
     logger.info("Signin successful. Session exported")
 
