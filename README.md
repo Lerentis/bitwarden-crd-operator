@@ -11,6 +11,7 @@ Bitwarden CRD Operator is a kubernetes Operator based on [kopf](https://github.c
 > DISCLAIMER:  
 > This project is still very work in progress :)
 
+
 ## Getting started
 
 You will need a `ClientID` and `ClientSecret` ([where to get these](https://bitwarden.com/help/personal-api-key/)) as well as your password.
@@ -55,7 +56,7 @@ And you are set to create your first secret using this operator. For that you ne
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: BitwardenSecret
 metadata:
   name: name-of-your-management-object
@@ -72,6 +73,8 @@ spec:
   id: "A Secret ID from bitwarden"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
+  labels: # Optional
+    key: value
 ```
 
 The ID can be extracted from the browser when you open a item the ID is in the URL. The resulting secret looks something like this:
@@ -86,6 +89,8 @@ metadata:
   annotations:
     managed: bitwarden-secrets.lerentis.uploadfilter24.eu
     managedObject: bw-operator/test
+  labels:
+    key: value
   name: name-of-your-management-object
   namespace: default
 type: Opaque
@@ -97,7 +102,7 @@ For managing registry credentials, or pull secrets, you can create another kind 
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: RegistryCredential
 metadata:
   name: name-of-your-management-object
@@ -108,6 +113,8 @@ spec:
   id: "A Secret ID from bitwarden"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
+  labels: # Optional
+    key: value
 ```
 
 The resulting secret looks something like this:
@@ -121,6 +128,8 @@ metadata:
   annotations:
     managed: bitwarden-secrets.lerentis.uploadfilter24.eu
     managedObject: bw-operator/test
+  labels:
+    key: value
   name: name-of-your-management-object
   namespace: default
 type: dockerconfigjson
@@ -128,11 +137,11 @@ type: dockerconfigjson
 
 ## BitwardenTemplate
 
-One of the more freely defined types that can be used with this operator you can just pass a whole template:
+One of the more freely defined types that can be used with this operator you can just pass a whole template. Also the lookup function `bitwarden_lookup` is available to reference parts of the secret:
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: BitwardenTemplate
 metadata:
   name: name-of-your-management-object
@@ -140,15 +149,17 @@ spec:
   filename: "Key of the secret to be created"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
+  labels: # Optional
+    key: value
   template: |
     ---
     api:
       enabled: True
-      key: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields", "name of a field in bitwarden") }}
+      key: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
       allowCrossOrigin: false
       apps:
         "some.app.identifier:some_version":
-          pubkey: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields", "name of a field in bitwarden") }}
+          pubkey: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
           enabled: true
 ```
 
@@ -163,9 +174,25 @@ metadata:
   annotations:
     managed: bitwarden-template.lerentis.uploadfilter24.eu
     managedObject: namespace/name-of-your-management-object
+  labels:
+    key: value
   name: Name of the secret to be created
   namespace: Namespace of the secret to be created
 type: Opaque
 ```
 
-please note that the rendering engine for this template is jinja2, with an addition of a custom `bitwarden_lookup` function, so there are more possibilities to inject here.
+The signature of `bitwarden_lookup` is `(item_id, scope, field)`:
+- `item_id`: The item ID of the secret in Bitwarden
+- `scope`: one of `login`, `fields` or `attachment`
+- `field`:
+  - when `scope` is `login`: either `username` or `password`
+  - when `scope` is `fields`: the name of a custom field
+  - when `scope` is `attachment`: the filename of a file attached to the item
+
+Please note that the rendering engine for this template is jinja2, with an addition of a custom `bitwarden_lookup` function, so there are more possibilities to inject here.
+
+## Configurations parameters
+
+The operator uses the bitwarden cli in the background and does not communicate to the api directly. The cli mirrors the credential store locally but doesn't sync it on every get request. Instead it will sync each secret every 15 minutes (900 seconds). You can adjust the interval by setting `BW_SYNC_INTERVAL` in the values. If your secrets update very very frequently, you can force the operator to do a sync before each get by setting `BW_FORCE_SYNC="true"`. You might run into rate limits if you do this too frequent.
+
+Additionally the bitwarden cli session may expire at some time. In order to create a new session, the login command is triggered from time to time. In what interval exactly can be configured with the env `BW_RELOGIN_INTERVAL` which defaults to 3600s.
