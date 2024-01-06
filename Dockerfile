@@ -1,13 +1,13 @@
-FROM alpine:3.18.3
+FROM alpine:3.19.0
 
 LABEL org.opencontainers.image.source=https://github.com/Lerentis/bitwarden-crd-operator
 LABEL org.opencontainers.image.description="Kubernetes Operator to create k8s secrets from bitwarden"
 LABEL org.opencontainers.image.licenses=MIT
 
-ARG PYTHON_VERSION=3.11.6-r0
-ARG PIP_VERSION=23.1.2-r0
-ARG GCOMPAT_VERSION=1.1.0-r1
-ARG LIBCRYPTO_VERSION=3.1.2-r0
+ARG PYTHON_VERSION=3.11.6-r1
+ARG PIP_VERSION=23.3.1-r0
+ARG GCOMPAT_VERSION=1.1.0-r4
+ARG LIBCRYPTO_VERSION=3.1.4-r2
 ARG BW_VERSION=2023.1.0
 
 COPY requirements.txt /requirements.txt
@@ -38,7 +38,7 @@ RUN set -eux; \
     mkdir -p /home/bw-operator; \
     chown -R bw-operator /home/bw-operator; \
     apk add gcc musl-dev libstdc++ gcompat=${GCOMPAT_VERSION} python3=${PYTHON_VERSION} py3-pip=${PIP_VERSION} libcrypto3=${LIBCRYPTO_VERSION}; \
-    pip install -r /requirements.txt --no-warn-script-location; \
+    pip install -r /requirements.txt --no-warn-script-location --break-system-packages; \
     rm /requirements.txt; \
     apk del --purge gcc musl-dev libstdc++;
 

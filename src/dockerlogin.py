@@ -44,6 +44,7 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
     id = spec.get('id')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
+    labels = spec.get('labels')
 
     unlock_bw(logger)
     logger.info(f"Locking up secret with ID: {id}")
@@ -55,9 +56,13 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
         "managed": "registry-credential.lerentis.uploadfilter24.eu",
         "managedObject": f"{namespace}/{name}"
     }
+
+    if not labels:
+        labels = {}
+
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations)
+        name=secret_name, annotations=annotations, labels=labels)
     secret = create_dockerlogin(
         logger,
         secret,
@@ -66,7 +71,7 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
         password_ref,
         registry)
 
-    obj = api.create_namespaced_secret(
+    api.create_namespaced_secret(
         secret_namespace, secret
     )
 
@@ -91,6 +96,7 @@ def update_managed_registry_secret(
     id = spec.get('id')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
+    labels = spec.get('labels')
 
     old_config = None
     old_secret_name = None
@@ -127,9 +133,13 @@ def update_managed_registry_secret(
         "managed": "registry-credential.lerentis.uploadfilter24.eu",
         "managedObject": f"{namespace}/{name}"
     }
+
+    if not labels:
+        labels = {}
+
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations)
+        name=secret_name, annotations=annotations, labels=labels)
     secret = create_dockerlogin(
         logger,
         secret,
@@ -138,7 +148,7 @@ def update_managed_registry_secret(
         password_ref,
         registry)
     try:
-        obj = api.replace_namespaced_secret(
+        api.replace_namespaced_secret(
             name=secret_name,
             body=secret,
             namespace="{}".format(secret_namespace))

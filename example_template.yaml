@@ -1,5 +1,5 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: BitwardenTemplate
 metadata:
   name: test
@@ -7,6 +7,9 @@ spec:
   filename: "config.yaml"
   name: "test-template"
   namespace: "default"
+  labels:
+    key: value
+    app: example-app
   template: |
     ---
     api:

@@ -1,5 +1,5 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: RegistryCredential
 metadata:
   name: test
@@ -10,3 +10,6 @@ spec:
   id: "3b249ec7-9ce7-440a-9558-f34f3ab10680"
   name: "test-regcred"
   namespace: "default"
+  labels:
+    namespace: default
+    tenant: example-team
