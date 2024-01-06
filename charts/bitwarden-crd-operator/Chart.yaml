@@ -103,6 +103,16 @@ annotations:
   artifacthub.io/changes: |
     - kind: changed
       description: "Added the possibility to add labels to generated secrets"
+    - kind: changed
+      description: "Updated Alpine to 3.19.0"
+    - kind: changed
+      description: "Update Python to 3.11.6-r1"
+    - kind: changed
+      description: "Update pip to 23.3.1-r0"
+    - kind: changed
+      description: "Update gcompat to 1.1.0-r4"
+    - kind: changed
+      description: "Update libcrypto3 to 3.1.4-r2"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: ghcr.io/lerentis/bitwarden-crd-operator:0.10.0
