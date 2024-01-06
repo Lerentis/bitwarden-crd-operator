@@ -41,6 +41,7 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
     id = spec.get('id')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
+    labels = spec.get('labels')
 
     unlock_bw(logger)
     logger.info(f"Locking up secret with ID: {id}")
@@ -52,12 +53,16 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
         "managed": "bitwarden-secret.lerentis.uploadfilter24.eu",
         "managedObject": f"{namespace}/{name}"
     }
+
+    if not labels:
+        labels = {}
+
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations)
+        name=secret_name, annotations=annotations, labels=labels)
     secret = create_kv(secret, secret_json_object, content_def)
 
-    obj = api.create_namespaced_secret(
+    api.create_namespaced_secret(
         namespace="{}".format(secret_namespace),
         body=secret
     )
