@@ -93,6 +93,7 @@ def update_managed_secret(
         old_secret_namespace = old_config['spec'].get('namespace')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
+    labels = spec.get('labels')
 
     if old_config is not None and (
             old_secret_name != secret_name or old_secret_namespace != secret_namespace):
@@ -119,13 +120,16 @@ def update_managed_secret(
         "managedObject": f"{namespace}/{name}"
     }
 
+    if not labels:
+        labels = {}
+
     secret = kubernetes.client.V1Secret()
     secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations)
+        name=secret_name, annotations=annotations, labels=labels)
     secret = create_kv(secret, secret_json_object, content_def)
 
     try:
-        obj = api.replace_namespaced_secret(
+        api.replace_namespaced_secret(
             name=secret_name,
             body=secret,
             namespace="{}".format(secret_namespace))
