@@ -17,7 +17,8 @@ spec:
   name: "test-secret"
   namespace: "default"
   labels:
-    - key: value
+    key: value
+    app: example-app
 ---
 apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: BitwardenSecret
@@ -32,5 +33,3 @@ spec:
   id: "466fc4b0-ffca-4444-8d88-b59d4de3d928"
   name: "test-scope"
   namespace: "default"
-  labels:
-    - key: value

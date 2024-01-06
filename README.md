@@ -56,7 +56,7 @@ And you are set to create your first secret using this operator. For that you ne
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: BitwardenSecret
 metadata:
   name: name-of-your-management-object
@@ -73,6 +73,8 @@ spec:
   id: "A Secret ID from bitwarden"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
+  labels: # Optional
+    key: value
 ```
 
 The ID can be extracted from the browser when you open a item the ID is in the URL. The resulting secret looks something like this:
@@ -87,6 +89,8 @@ metadata:
   annotations:
     managed: bitwarden-secrets.lerentis.uploadfilter24.eu
     managedObject: bw-operator/test
+  labels:
+    key: value
   name: name-of-your-management-object
   namespace: default
 type: Opaque
@@ -98,7 +102,7 @@ For managing registry credentials, or pull secrets, you can create another kind 
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: RegistryCredential
 metadata:
   name: name-of-your-management-object
@@ -109,6 +113,8 @@ spec:
   id: "A Secret ID from bitwarden"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
+  labels: # Optional
+    key: value
 ```
 
 The resulting secret looks something like this:
@@ -122,6 +128,8 @@ metadata:
   annotations:
     managed: bitwarden-secrets.lerentis.uploadfilter24.eu
     managedObject: bw-operator/test
+  labels:
+    key: value
   name: name-of-your-management-object
   namespace: default
 type: dockerconfigjson
@@ -133,7 +141,7 @@ One of the more freely defined types that can be used with this operator you can
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta4"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
 kind: BitwardenTemplate
 metadata:
   name: name-of-your-management-object
@@ -141,6 +149,8 @@ spec:
   filename: "Key of the secret to be created"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
+  labels: # Optional
+    key: value
   template: |
     ---
     api:
@@ -164,6 +174,8 @@ metadata:
   annotations:
     managed: bitwarden-template.lerentis.uploadfilter24.eu
     managedObject: namespace/name-of-your-management-object
+  labels:
+    key: value
   name: Name of the secret to be created
   namespace: Namespace of the secret to be created
 type: Opaque

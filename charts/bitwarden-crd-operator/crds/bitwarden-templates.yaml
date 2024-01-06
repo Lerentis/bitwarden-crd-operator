@@ -14,8 +14,9 @@ spec:
       - bwt
   versions:
     - name: v1beta4
-      served: false
-      storage: true
+      served: true
+      storage: false
+      deprecated: true
       schema:
         openAPIV3Schema:
           type: object
@@ -55,21 +56,8 @@ spec:
                 name:
                   type: string
                 labels:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      json:
-                        x-kubernetes-preserve-unknown-fields: true
-                        type: object
-                        properties:
-                          spec:
-                            type: object
-                            properties:
-                              foo:
-                                type: string
-                              bar:
-                                type: string
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
               required:
                 - filename
                 - template
