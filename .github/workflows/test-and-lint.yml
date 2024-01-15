@@ -36,6 +36,18 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
+      - name: Install ah cli
+        run: |
+          export AH_VERSION=1.17.0
+          curl -LO https://github.com/artifacthub/hub/releases/download/v${AH_VERSION}/ah_${AH_VERSION}_linux_amd64.tar.gz
+          tar -xf ah_${AH_VERSION}_linux_amd64.tar.gz
+          chmod +x ./ah
+          sudo mv ./ah /usr/bin/ah
+          rm LICENSE
+      - name: ah lint
+        run: |
+          ah lint
+
   pr-build:
     runs-on: ubuntu-latest
     steps:
