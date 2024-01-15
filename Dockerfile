@@ -9,7 +9,7 @@ ARG PIP_VERSION=23.3.1-r0
 ARG GCOMPAT_VERSION=1.1.0-r4
 ARG LIBCRYPTO_VERSION=3.1.4-r2
 ARG BW_VERSION=2023.7.0
-ARG NODE_VERSION=20.10.0-r1
+ARG NODE_VERSION=20.11.0-r0
 
 COPY requirements.txt /requirements.txt
 
@@ -18,6 +18,7 @@ RUN set -eux; \
     ARCH="$(apk --print-arch)"; \
     case "${ARCH}" in \
        aarch64|arm64) \
+          apk del nodejs-current; \
           apk add nodejs=${NODE_VERSION} npm; \
           npm install -g @bitwarden/cli@${BW_VERSION}; \
          ;; \
