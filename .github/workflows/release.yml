@@ -77,7 +77,7 @@ jobs:
         uses: WyriHaximus/github-action-get-previous-tag@v1
 
       - name: Download SBOM from github action
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.ANCHORE_SBOM_ACTION_PRIOR_ARTIFACT }}
 
