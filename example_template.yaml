@@ -20,3 +20,6 @@ spec:
         "some.app.identifier:some_version":
           pubkey: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "public_key") }}
           enabled: true
+          username: {{ bitwarden_lookup_with_name("Some/App/Identifier/Path", "SecretName", "login", "username") }}
+          specialField: {{ bitwarden_lookup_with_name("Some/App/Identifier/Path", "SecretName", "fields", "specialField") }}
+          pvtkey: {{ bitwarden_lookup_with_name("Some/App/Identifier/Path", "SecretName", "attachment", "private_key") }}

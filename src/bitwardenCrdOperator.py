@@ -19,6 +19,7 @@ def bitwarden_signin(logger, **kwargs):
         logger.info("BW_HOST not set. Assuming SaaS installation")
     command_wrapper(logger, "login --apikey")
     unlock_bw(logger)
+    sync_bw(logger)
 
 def run_continuously(interval=30):
     cease_continuous_run = threading.Event()

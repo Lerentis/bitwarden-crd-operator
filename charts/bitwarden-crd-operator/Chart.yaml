@@ -65,6 +65,24 @@ annotations:
         labels:
           key: value
     - apiVersion: lerentis.uploadfilter24.eu/v1beta5
+      kind: BitwardenSecret
+      metadata:
+        name: test
+      spec:
+        content:
+          - element:
+              secretName: username
+              secretRef: nameofUser
+          - element:
+              secretName: password
+              secretRef: passwordOfUser
+        itemName: "SecretName"
+        collectionPath: "Some/App/Identifier/Path"
+        name: "test-secret-from-item-name"
+        namespace: "default"
+        labels:
+          key: value
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta5
       kind: RegistryCredential
       metadata:
         name: test
@@ -97,6 +115,9 @@ annotations:
               "some.app.identifier:some_version":
                 pubkey: {{ bitwarden_lookup("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "attachment", "public_key") }}
                 enabled: true
+                username: {{ bitwarden_lookup_with_name("Some/App/Identifier/Path", "SecretName", "login", "username") }}
+                specialField: {{ bitwarden_lookup_with_name("Some/App/Identifier/Path", "SecretName", "fields", "specialField") }}
+                pvtkey: {{ bitwarden_lookup_with_name("Some/App/Identifier/Path", "SecretName", "attachment", "private_key") }}
   artifacthub.io/license: MIT
   artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
