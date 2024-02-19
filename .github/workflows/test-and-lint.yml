@@ -65,3 +65,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/lerentis/bitwarden-crd-operator:dev
 
+      - name: test simple run
+        run: docker run -it --rm --entrypoint=/bin/sh ghcr.io/lerentis/bitwarden-crd-operator:dev -c bw --version
