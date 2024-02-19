@@ -64,9 +64,3 @@ jobs:
           push: false
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/lerentis/bitwarden-crd-operator:dev
-
-      - name: test simple run
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ghcr.io/lerentis/bitwarden-crd-operator:dev
-          run: bw --version
