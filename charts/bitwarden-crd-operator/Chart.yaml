@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.11.2"
+version: "v0.11.3"
 
-appVersion: "0.10.2"
+appVersion: "0.10.3"
 
 keywords:
   - operator
@@ -102,9 +102,11 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update jinja to 3.1.3"
+      description: "Update python to 3.11.8-r0"
     - kind: changed
-      description: "Update Node on arm to 20.11.0-r0"
+      description: "Update Node to 20.11.1-r0"
+    - kind: changed
+      description: "Unified bw cli installation methode"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: ghcr.io/lerentis/bitwarden-crd-operator:0.10.2
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.10.3

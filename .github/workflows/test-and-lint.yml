@@ -57,7 +57,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: "GHCR Build"
+      - name: GHCR Build
         id: docker_build
         uses: docker/build-push-action@v5
         with:
@@ -66,4 +66,7 @@ jobs:
           tags: ghcr.io/lerentis/bitwarden-crd-operator:dev
 
       - name: test simple run
-        run: docker run -it --rm --entrypoint=/bin/sh ghcr.io/lerentis/bitwarden-crd-operator:dev -c bw --version
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ghcr.io/lerentis/bitwarden-crd-operator:dev
+          run: bw --version
