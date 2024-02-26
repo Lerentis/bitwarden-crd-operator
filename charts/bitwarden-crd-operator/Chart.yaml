@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.11.3"
+version: "v0.12.0"
 
-appVersion: "0.10.3"
+appVersion: "0.11.0"
 
 keywords:
   - operator
@@ -32,22 +32,22 @@ annotations:
       url: https://github.com/Lerentis/bitwarden-crd-operator
   artifacthub.io/crds: |
     - kind: BitwardenSecret
-      version: v1beta5
+      version: v1beta6
       name: bitwarden-secret
       displayName: Bitwarden Secret
       description: Management Object to create secrets from bitwarden
     - kind: RegistryCredential
-      version: v1beta5
+      version: v1beta6
       name: registry-credential
       displayName: Regestry Credentials
       description: Management Object to create regestry secrets from bitwarden
     - kind: BitwardenTemplate
-      version: v1beta5
+      version: v1beta6
       name: bitwarden-template
       displayName: Bitwarden Template
       description: Management Object to create secrets from a jinja template with a bitwarden lookup
   artifacthub.io/crdsExamples: |
-    - apiVersion: lerentis.uploadfilter24.eu/v1beta5
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta6
       kind: BitwardenSecret
       metadata:
         name: test
@@ -64,7 +64,7 @@ annotations:
         namespace: "default"
         labels:
           key: value
-    - apiVersion: lerentis.uploadfilter24.eu/v1beta5
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta6
       kind: BitwardenSecret
       metadata:
         name: test
@@ -82,7 +82,7 @@ annotations:
         namespace: "default"
         labels:
           key: value
-    - apiVersion: lerentis.uploadfilter24.eu/v1beta5
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta6
       kind: RegistryCredential
       metadata:
         name: test
@@ -95,7 +95,7 @@ annotations:
         namespace: "default"
         labels:
           key: value
-    - apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+    - apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
       kind: BitwardenTemplate
       metadata:
         name: test
@@ -122,12 +122,14 @@ annotations:
   artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
+    - kind: added
+      description: "Allow secret lookup by name and collection path"
     - kind: changed
-      description: "Update python to 3.11.8-r0"
+      description: "Deprecated v1beta4 and introduced v1beta6"
+    - kind: added
+      description: "Added owner_references block to generated secret metadata"
     - kind: changed
-      description: "Update Node to 20.11.1-r0"
-    - kind: changed
-      description: "Unified bw cli installation methode"
+      description: "Refactor some code to remove code duplication."
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: ghcr.io/lerentis/bitwarden-crd-operator:0.10.3
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.11.0

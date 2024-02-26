@@ -1,5 +1,5 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
 kind: BitwardenSecret
 metadata:
   name: test
@@ -20,7 +20,7 @@ spec:
     key: value
     app: example-app
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
 kind: BitwardenSecret
 metadata:
   name: test-scope
@@ -34,7 +34,7 @@ spec:
   name: "test-scope"
   namespace: "default"
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
 kind: BitwardenSecret
 metadata:
   name: test-lookup-by-name

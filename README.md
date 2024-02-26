@@ -8,7 +8,7 @@ Bitwarden CRD Operator is a kubernetes Operator based on [kopf](https://github.c
   <img src="logo.png" alt="Bitwarden CRD Operator Logo" width="200"/>
 </p>
 
-> DISCLAIMER:  
+> DISCLAIMER:
 > This project is still very work in progress :)
 
 
@@ -45,7 +45,7 @@ After that it is a basic helm deployment:
 
 ```bash
 helm repo add bitwarden-operator https://lerentis.github.io/bitwarden-crd-operator
-helm repo update 
+helm repo update
 kubectl create namespace bw-operator
 helm upgrade --install --namespace bw-operator -f values.yaml bw-operator bitwarden-operator/bitwarden-crd-operator
 ```
@@ -56,7 +56,7 @@ And you are set to create your first secret using this operator. For that you ne
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
 kind: BitwardenSecret
 metadata:
   name: name-of-your-management-object
@@ -64,12 +64,12 @@ spec:
   content:
     - element:
         secretName: nameOfTheFieldInBitwarden # for example username
-        secretRef: nameOfTheKeyInTheSecretToBeCreated 
-        secretScope: login # for custom entries on bitwarden use 'fields' 
+        secretRef: nameOfTheKeyInTheSecretToBeCreated
+        secretScope: login # for custom entries on bitwarden use 'fields'
     - element:
         secretName: nameOfAnotherFieldInBitwarden # for example password
-        secretRef: nameOfAnotherKeyInTheSecretToBeCreated 
-        secretScope: login # for custom entries on bitwarden use 'fields' 
+        secretRef: nameOfAnotherKeyInTheSecretToBeCreated
+        secretScope: login # for custom entries on bitwarden use 'fields'
   id: "A Secret ID from bitwarden"
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
@@ -102,7 +102,7 @@ For managing registry credentials, or pull secrets, you can create another kind 
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
 kind: RegistryCredential
 metadata:
   name: name-of-your-management-object
@@ -141,7 +141,7 @@ One of the more freely defined types that can be used with this operator you can
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
 kind: BitwardenTemplate
 metadata:
   name: name-of-your-management-object

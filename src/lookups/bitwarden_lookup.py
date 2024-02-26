@@ -1,5 +1,6 @@
-from utils.utils import get_secret_from_bitwarden, get_collection_secret_from_bitwarden, \
-                        get_attachment, parse_fields_scope, parse_login_scope
+from utils.utils import get_secret_from_bitwarden, get_secret_with_id_from_bitwarden, \
+                        get_collection_secret_from_bitwarden, get_attachment, \
+                        parse_fields_scope, parse_login_scope
 
 
 class BitwardenLookupHandler:
