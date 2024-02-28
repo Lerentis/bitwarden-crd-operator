@@ -45,5 +45,6 @@ spec:
         secretRef: pubKey
         secretScope: fields
   collectionPath: "Some/App/Identifier/Path"
+  name: "bitwarden-secret-name"
   itemName: "test-secret-lookup-by-name"
   namespace: "default"
