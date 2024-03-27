@@ -1,5 +1,5 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
 kind: BitwardenSecret
 metadata:
   name: test
@@ -7,11 +7,11 @@ spec:
   content:
     - element:
         secretName: username
-        secretRef: nameofUser 
+        secretRef: nameofUser
         secretScope: login
     - element:
         secretName: password
-        secretRef: passwordOfUser 
+        secretRef: passwordOfUser
         secretScope: login
   id: "88781348-c81c-4367-9801-550360c21295"
   name: "test-secret"
@@ -20,7 +20,7 @@ spec:
     key: value
     app: example-app
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
 kind: BitwardenSecret
 metadata:
   name: test-scope
@@ -28,8 +28,23 @@ spec:
   content:
     - element:
         secretName: public_key
-        secretRef: pubKey 
+        secretRef: pubKey
         secretScope: fields
   id: "466fc4b0-ffca-4444-8d88-b59d4de3d928"
   name: "test-scope"
+  namespace: "default"
+---
+apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
+kind: BitwardenSecret
+metadata:
+  name: test-lookup-by-name
+spec:
+  content:
+    - element:
+        secretName: public_key
+        secretRef: pubKey
+        secretScope: fields
+  collectionPath: "Some/App/Identifier/Path"
+  name: "bitwarden-secret-name"
+  itemName: "test-secret-lookup-by-name"
   namespace: "default"

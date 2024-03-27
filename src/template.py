@@ -12,11 +12,38 @@ def render_template(logger, template):
     jinja_template = Environment(loader=BaseLoader()).from_string(template)
     jinja_template.globals.update({
         "bitwarden_lookup": BitwardenLookupHandler(logger).bitwarden_lookup,
+        "bitwarden_lookup_with_name": BitwardenLookupHandler(logger).bitwarden_lookup_with_name,
     })
     return jinja_template.render()
 
 
-def create_template_secret(logger, secret, filename, template):
+def create_template_secret(logger, spec, body, **kwargs):
+    template = spec.get('template')
+    filename = spec.get('filename')
+    secret_name = spec.get('name')
+    labels = spec.get('labels')
+
+    annotations = {
+        "managed": "bitwarden-template.lerentis.uploadfilter24.eu",
+        "managedObject": f"{body.get('metadata').get('namespace')}/{body.get('metadata').get('name')}"
+    }
+
+    if not labels:
+        labels = {}
+
+    owner_references = [{
+        "apiVersion": f"{body.get('apiVersion')}",
+        "blockOwnerDeletion": True,
+        "controller": True,
+        "kind": f"{body.get('kind')}",
+        "name": f"{body.get('metadata').get('name')}",
+        "uid": f"{body.get('metadata').get('uid')}",
+    }]
+
+    secret = kubernetes.client.V1Secret()
+    secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name,
+        annotations=annotations, labels=labels, owner_references=owner_references)
+
     secret.type = "Opaque"
     secret.data = {}
     secret.data[filename] = str(
@@ -28,35 +55,22 @@ def create_template_secret(logger, secret, filename, template):
 
 @kopf.on.create('bitwarden-template.lerentis.uploadfilter24.eu')
 def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
-
-    template = spec.get('template')
-    filename = spec.get('filename')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
-    labels = spec.get('labels')
 
     unlock_bw(logger)
-
+    secret = create_template_secret(logger, spec, body, **kwargs)
     api = kubernetes.client.CoreV1Api()
+    api.create_namespaced_secret(secret_namespace, secret)
 
-    annotations = {
-        "managed": "bitwarden-template.lerentis.uploadfilter24.eu",
-        "managedObject": f"{namespace}/{name}"
-    }
-
-    if not labels:
-        labels = {}
-
-    secret = kubernetes.client.V1Secret()
-    secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations, labels=labels)
-    secret = create_template_secret(logger, secret, filename, template)
-
-    api.create_namespaced_secret(
-        secret_namespace, secret
-    )
-
-    logger.info(f"Secret {secret_namespace}/{secret_name} has been created")
+    try:
+        api = kubernetes.client.CoreV1Api()
+        api.create_namespaced_secret(secret_namespace, secret)
+        logger.info(f"Secret {secret_namespace}/{secret_name} has been created")
+    except BaseException as e:
+        logger.info(e)
+        logger.warn(
+            f"Could not create secret '{secret_namespace}/{secret_name}!")
 
 
 @kopf.on.update('bitwarden-template.lerentis.uploadfilter24.eu')
@@ -84,8 +98,6 @@ def update_managed_secret(
             body.metadata.annotations['kopf.zalando.org/last-handled-configuration'])
         old_secret_name = old_config['spec'].get('name')
         old_secret_namespace = old_config['spec'].get('namespace')
-    secret_name = spec.get('name')
-    secret_namespace = spec.get('namespace')
 
     if old_config is not None and (
             old_secret_name != secret_name or old_secret_namespace != secret_namespace):
@@ -102,23 +114,10 @@ def update_managed_secret(
         return
 
     unlock_bw(logger)
-
-    api = kubernetes.client.CoreV1Api()
-
-    annotations = {
-        "managed": "bitwarden-template.lerentis.uploadfilter24.eu",
-        "managedObject": f"{namespace}/{name}"
-    }
-
-    if not labels:
-        labels = {}
-
-    secret = kubernetes.client.V1Secret()
-    secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations, labels=labels)
-    secret = create_template_secret(logger, secret, filename, template)
+    secret = create_template_secret(logger, spec, body, **kwargs)
 
     try:
+        api = kubernetes.client.CoreV1Api()
         api.replace_namespaced_secret(
             name=secret_name,
             body=secret,

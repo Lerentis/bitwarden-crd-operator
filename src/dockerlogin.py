@@ -6,19 +6,40 @@ import json
 from utils.utils import unlock_bw, get_secret_from_bitwarden, bw_sync_interval
 
 
-def create_dockerlogin(
-        logger,
-        secret,
-        secret_json,
-        username_ref,
-        password_ref,
-        registry):
-    secret.type = "kubernetes.io/dockerconfigjson"
-    secret.data = {}
+def create_dockerlogin(logger, spec, secret_json, body):
     auths_dict = {}
     registry_dict = {}
     reg_auth_dict = {}
 
+    username_ref = spec.get('usernameRef')
+    password_ref = spec.get('passwordRef')
+    registry = spec.get('registry')
+    secret_name = spec.get('name')
+
+    secret = kubernetes.client.V1Secret()
+    secret.type = "kubernetes.io/dockerconfigjson"
+    secret.data = {}
+
+    annotations = {
+        "managed": "registry-credential.lerentis.uploadfilter24.eu",
+        "managedObject": f"{body.get('metadata').get('namespace')}/{body.get('metadata').get('name')}"
+    }
+
+    labels = spec.get('labels')
+    if not labels:
+        labels = {}
+
+    owner_references = [{
+        "apiVersion": f"{body.get('apiVersion')}",
+        "blockOwnerDeletion": True,
+        "controller": True,
+        "kind": f"{body.get('kind')}",
+        "name": f"{body.get('metadata').get('name')}",
+        "uid": f"{body.get('metadata').get('uid')}",
+    }]
+
+    secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name,
+        annotations=annotations, labels=labels, owner_references=owner_references)
     _username = secret_json["login"][username_ref]
     logger.info(f"Creating login with username: {_username}")
     _password = secret_json["login"][password_ref]
@@ -37,46 +58,21 @@ def create_dockerlogin(
 
 
 @kopf.on.create('registry-credential.lerentis.uploadfilter24.eu')
-def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
-    username_ref = spec.get('usernameRef')
-    password_ref = spec.get('passwordRef')
-    registry = spec.get('registry')
-    id = spec.get('id')
+def create_managed_registry_secret(spec, name, namespace, logger, body, **kwargs):
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
-    labels = spec.get('labels')
 
     unlock_bw(logger)
-    logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = get_secret_from_bitwarden(logger, id)
+    secret_json_object = get_secret_from_bitwarden(logger, spec)
 
     api = kubernetes.client.CoreV1Api()
-
-    annotations = {
-        "managed": "registry-credential.lerentis.uploadfilter24.eu",
-        "managedObject": f"{namespace}/{name}"
-    }
-
-    if not labels:
-        labels = {}
-
-    secret = kubernetes.client.V1Secret()
-    secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations, labels=labels)
-    secret = create_dockerlogin(
-        logger,
-        secret,
-        secret_json_object["data"],
-        username_ref,
-        password_ref,
-        registry)
-
-    api.create_namespaced_secret(
-        secret_namespace, secret
-    )
-
-    logger.info(
-        f"Registry Secret {secret_namespace}/{secret_name} has been created")
+    secret = create_dockerlogin(logger, spec, secret_json_object, body)
+    try:
+        api.create_namespaced_secret(secret_namespace, secret)
+        logger.info(
+            f"Registry Secret {secret_namespace}/{secret_name} has been created")
+    except BaseException:
+        logger.warn(f"Could not create secret {secret_namespace}/{secret_name}!")
 
 
 @kopf.on.update('registry-credential.lerentis.uploadfilter24.eu')
@@ -90,13 +86,8 @@ def update_managed_registry_secret(
         body,
         **kwargs):
 
-    username_ref = spec.get('usernameRef')
-    password_ref = spec.get('passwordRef')
-    registry = spec.get('registry')
-    id = spec.get('id')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
-    labels = spec.get('labels')
 
     old_config = None
     old_secret_name = None
@@ -124,29 +115,11 @@ def update_managed_registry_secret(
         return
 
     unlock_bw(logger)
-    logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = get_secret_from_bitwarden(logger, id)
+    secret_json_object = get_secret_from_bitwarden(logger, spec)
 
     api = kubernetes.client.CoreV1Api()
 
-    annotations = {
-        "managed": "registry-credential.lerentis.uploadfilter24.eu",
-        "managedObject": f"{namespace}/{name}"
-    }
-
-    if not labels:
-        labels = {}
-
-    secret = kubernetes.client.V1Secret()
-    secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations, labels=labels)
-    secret = create_dockerlogin(
-        logger,
-        secret,
-        secret_json_object["data"],
-        username_ref,
-        password_ref,
-        registry)
+    secret = create_dockerlogin(logger, spec, secret_json_object, body)
     try:
         api.replace_namespaced_secret(
             name=secret_name,

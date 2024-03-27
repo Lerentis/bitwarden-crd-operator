@@ -13,7 +13,7 @@ spec:
     shortNames:
       - bwt
   versions:
-    - name: v1beta4
+    - name: v1beta5
       served: true
       storage: false
       deprecated: true
@@ -32,12 +32,15 @@ spec:
                   type: string
                 name:
                   type: string
+                labels:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
               required:
                 - filename
                 - template
                 - namespace
                 - name
-    - name: v1beta5
+    - name: v1beta6
       served: true
       storage: true
       schema:

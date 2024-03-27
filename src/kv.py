@@ -5,7 +5,32 @@ import json
 
 from utils.utils import unlock_bw, get_secret_from_bitwarden, parse_login_scope, parse_fields_scope, bw_sync_interval
 
-def create_kv(secret, secret_json, content_def):
+
+def create_kv(logger, spec, body, secret_json, **kwargs):
+    secret_name = spec.get('name')
+    labels = spec.get('labels')
+    content_def = spec.get('content')
+    annotations = {
+        "managed": "bitwarden-secret.lerentis.uploadfilter24.eu",
+        "managedObject": f"{body.get('metadata').get('namespace')}/{body.get('metadata').get('name')}"
+    }
+
+    if not labels:
+        labels = {}
+
+    owner_references = [{
+        "apiVersion": f"{body.get('apiVersion')}",
+        "blockOwnerDeletion": True,
+        "controller": True,
+        "kind": f"{body.get('kind')}",
+        "name": f"{body.get('metadata').get('name')}",
+        "uid": f"{body.get('metadata').get('uid')}",
+    }]
+
+    secret = kubernetes.client.V1Secret()
+    secret.metadata = kubernetes.client.V1ObjectMeta(name=secret_name,
+        annotations=annotations, labels=labels, owner_references=owner_references)
+
     secret.type = "Opaque"
     secret.data = {}
     for eleml in content_def:
@@ -36,38 +61,23 @@ def create_kv(secret, secret_json, content_def):
 
 @kopf.on.create('bitwarden-secret.lerentis.uploadfilter24.eu')
 def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
-
-    content_def = body['spec']['content']
-    id = spec.get('id')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
-    labels = spec.get('labels')
 
     unlock_bw(logger)
-    logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = get_secret_from_bitwarden(logger, id)
+    secret_json_object = get_secret_from_bitwarden(logger, spec)
 
     api = kubernetes.client.CoreV1Api()
-
-    annotations = {
-        "managed": "bitwarden-secret.lerentis.uploadfilter24.eu",
-        "managedObject": f"{namespace}/{name}"
-    }
-
-    if not labels:
-        labels = {}
-
-    secret = kubernetes.client.V1Secret()
-    secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations, labels=labels)
-    secret = create_kv(secret, secret_json_object, content_def)
-
-    api.create_namespaced_secret(
-        namespace="{}".format(secret_namespace),
-        body=secret
-    )
-
-    logger.info(f"Secret {secret_namespace}/{secret_name} has been created")
+    secret = create_kv(logger, spec, body, secret_json_object)
+    try:
+        api.create_namespaced_secret(
+            namespace="{}".format(secret_namespace),
+            body=secret
+        )
+        logger.info(f"Secret {secret_namespace}/{secret_name} has been created")
+    except BaseException:
+        logger.warn(
+            f"Could not create secret {secret_namespace}/{secret_name}!")
 
 
 @kopf.on.update('bitwarden-secret.lerentis.uploadfilter24.eu')
@@ -81,8 +91,6 @@ def update_managed_secret(
         body,
         **kwargs):
 
-    content_def = body['spec']['content']
-    id = spec.get('id')
     old_config = None
     old_secret_name = None
     old_secret_namespace = None
@@ -93,7 +101,6 @@ def update_managed_secret(
         old_secret_namespace = old_config['spec'].get('namespace')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
-    labels = spec.get('labels')
 
     if old_config is not None and (
             old_secret_name != secret_name or old_secret_namespace != secret_namespace):
@@ -110,23 +117,10 @@ def update_managed_secret(
         return
 
     unlock_bw(logger)
-    logger.info(f"Locking up secret with ID: {id}")
-    secret_json_object = get_secret_from_bitwarden(logger, id)
+    secret_json_object = get_secret_from_bitwarden(logger, spec)
 
     api = kubernetes.client.CoreV1Api()
-
-    annotations = {
-        "managed": "bitwarden-secret.lerentis.uploadfilter24.eu",
-        "managedObject": f"{namespace}/{name}"
-    }
-
-    if not labels:
-        labels = {}
-
-    secret = kubernetes.client.V1Secret()
-    secret.metadata = kubernetes.client.V1ObjectMeta(
-        name=secret_name, annotations=annotations, labels=labels)
-    secret = create_kv(secret, secret_json_object, content_def)
+    secret = create_kv(logger, spec, body, secret_json_object)
 
     try:
         api.replace_namespaced_secret(
