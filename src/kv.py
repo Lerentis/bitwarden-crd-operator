@@ -42,6 +42,7 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
     labels = spec.get('labels')
+    custom_annotations = spec.get('annotations')
 
     unlock_bw(logger)
     logger.info(f"Locking up secret with ID: {id}")
@@ -54,6 +55,9 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
         "managedObject": f"{namespace}/{name}"
     }
 
+    if custom_annotations:
+        annotations.update(custom_annotations)
+
     if not labels:
         labels = {}
 
@@ -62,7 +66,10 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
         name=secret_name, annotations=annotations, labels=labels)
     secret = create_kv(secret, secret_json_object, content_def)
 
-    kopf.append_owner_reference(secret)
+    # Garbage collection will delete the generated secret if the owner
+    # Is not in the same namespace as the generated secret
+    if secret_namespace == namespace:
+        kopf.append_owner_reference(secret)
 
     api.create_namespaced_secret(
         namespace="{}".format(secret_namespace),
@@ -96,6 +103,7 @@ def update_managed_secret(
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
     labels = spec.get('labels')
+    custom_annotations = spec.get('annotations')
 
     if old_config is not None and (
             old_secret_name != secret_name or old_secret_namespace != secret_namespace):
@@ -122,6 +130,9 @@ def update_managed_secret(
         "managedObject": f"{namespace}/{name}"
     }
 
+    if custom_annotations:
+        annotations.update(custom_annotations)
+
     if not labels:
         labels = {}
 
@@ -130,7 +141,10 @@ def update_managed_secret(
         name=secret_name, annotations=annotations, labels=labels)
     secret = create_kv(secret, secret_json_object, content_def)
 
-    kopf.append_owner_reference(secret)
+    # Garbage collection will delete the generated secret if the owner
+    # Is not in the same namespace as the generated secret
+    if secret_namespace == namespace:
+        kopf.append_owner_reference(secret)
 
     try:
         api.replace_namespaced_secret(
@@ -139,9 +153,12 @@ def update_managed_secret(
             namespace="{}".format(secret_namespace))
         logger.info(
             f"Secret {secret_namespace}/{secret_name} has been updated")
-    except BaseException:
+    except BaseException as e:
         logger.warn(
             f"Could not update secret {secret_namespace}/{secret_name}!")
+        logger.warn(
+            f"Exception: {e}"
+        )
 
 
 @kopf.on.delete('bitwarden-secret.lerentis.uploadfilter24.eu')

@@ -32,22 +32,22 @@ annotations:
       url: https://github.com/Lerentis/bitwarden-crd-operator
   artifacthub.io/crds: |
     - kind: BitwardenSecret
-      version: v1beta5
+      version: v1beta6
       name: bitwarden-secret
       displayName: Bitwarden Secret
       description: Management Object to create secrets from bitwarden
     - kind: RegistryCredential
-      version: v1beta5
+      version: v1beta6
       name: registry-credential
       displayName: Regestry Credentials
       description: Management Object to create regestry secrets from bitwarden
     - kind: BitwardenTemplate
-      version: v1beta5
+      version: v1beta6
       name: bitwarden-template
       displayName: Bitwarden Template
       description: Management Object to create secrets from a jinja template with a bitwarden lookup
   artifacthub.io/crdsExamples: |
-    - apiVersion: lerentis.uploadfilter24.eu/v1beta5
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta6
       kind: BitwardenSecret
       metadata:
         name: test
@@ -64,7 +64,9 @@ annotations:
         namespace: "default"
         labels:
           key: value
-    - apiVersion: lerentis.uploadfilter24.eu/v1beta5
+        annotations:
+          key: value
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta6
       kind: RegistryCredential
       metadata:
         name: test
@@ -77,7 +79,9 @@ annotations:
         namespace: "default"
         labels:
           key: value
-    - apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+        annotations:
+          key: value
+    - apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
       kind: BitwardenTemplate
       metadata:
         name: test
@@ -86,6 +90,8 @@ annotations:
         name: "test-regcred"
         namespace: "default"
         labels:
+          key: value
+        annotations:
           key: value
         template: |
           ---
@@ -116,7 +122,7 @@ annotations:
     - kind: added
       description: "Allow custom annotations to generated secrets"
     - kind: added
-      description: "Set ownership of generated secrets"
+      description: "Set ownership of generated secrets if CRD is in the same namespace"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: ghcr.io/lerentis/bitwarden-crd-operator:0.11.0
