@@ -52,6 +52,8 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
         name=secret_name, annotations=annotations, labels=labels)
     secret = create_template_secret(logger, secret, filename, template)
 
+    kopf.append_owner_reference(secret)
+
     api.create_namespaced_secret(
         secret_namespace, secret
     )
@@ -117,6 +119,8 @@ def update_managed_secret(
     secret.metadata = kubernetes.client.V1ObjectMeta(
         name=secret_name, annotations=annotations, labels=labels)
     secret = create_template_secret(logger, secret, filename, template)
+
+    kopf.append_owner_reference(secret)
 
     try:
         api.replace_namespaced_secret(

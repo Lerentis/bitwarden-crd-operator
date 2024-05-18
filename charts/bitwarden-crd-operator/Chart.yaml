@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.11.3"
+version: "v0.12.0"
 
-appVersion: "0.10.3"
+appVersion: "0.11.0"
 
 keywords:
   - operator
@@ -102,11 +102,21 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update python to 3.11.8-r0"
+      description: "Update python to 3.11.9-r0"
     - kind: changed
-      description: "Update Node to 20.11.1-r0"
+      description: "Update Node to 20.12.1-r0"
     - kind: changed
-      description: "Unified bw cli installation methode"
+      description: "Update libcrypto3 to 3.1.4-r5"
+    - kind: changed
+      description: "Update alpine to 3.19.1"
+    - kind: changed
+      description: "Update kopf to 1.37.2"
+    - kind: changed
+      description: "Update jinja to 3.1.4"
+    - kind: added
+      description: "Allow custom annotations to generated secrets"
+    - kind: added
+      description: "Set ownership of generated secrets"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: ghcr.io/lerentis/bitwarden-crd-operator:0.10.3
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.11.0

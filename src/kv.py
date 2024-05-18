@@ -62,6 +62,8 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
         name=secret_name, annotations=annotations, labels=labels)
     secret = create_kv(secret, secret_json_object, content_def)
 
+    kopf.append_owner_reference(secret)
+
     api.create_namespaced_secret(
         namespace="{}".format(secret_namespace),
         body=secret
@@ -127,6 +129,8 @@ def update_managed_secret(
     secret.metadata = kubernetes.client.V1ObjectMeta(
         name=secret_name, annotations=annotations, labels=labels)
     secret = create_kv(secret, secret_json_object, content_def)
+
+    kopf.append_owner_reference(secret)
 
     try:
         api.replace_namespaced_secret(

@@ -70,6 +70,8 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
         username_ref,
         password_ref,
         registry)
+    
+    kopf.append_owner_reference(secret)
 
     api.create_namespaced_secret(
         secret_namespace, secret
@@ -147,6 +149,9 @@ def update_managed_registry_secret(
         username_ref,
         password_ref,
         registry)
+    
+    kopf.append_owner_reference(secret)
+
     try:
         api.replace_namespaced_secret(
             name=secret_name,
