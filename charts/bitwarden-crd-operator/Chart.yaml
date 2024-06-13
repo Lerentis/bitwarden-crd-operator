@@ -61,26 +61,7 @@ annotations:
               secretRef: passwordOfUser
         id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
         name: "test-secret"
-        secretType: Obaque
-        namespace: "default"
-        labels:
-          key: value
-        annotations:
-          key: value
-     - apiVersion: lerentis.uploadfilter24.eu/v1beta1
-      kind: BitwardenTLSSecret
-      metadata:
-        name: test
-      spec:
-        content:
-          - element:
-              secretName: username
-              secretRef: nameofUser
-          - element:
-              secretName: password
-              secretRef: passwordOfUser
-        id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
-        name: "test-secret"
+        secretType: Obaque #Optional
         namespace: "default"
         labels:
           key: value
@@ -127,7 +108,7 @@ annotations:
   artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: added
       description: "Allow custom type for generated secrets"
     - kind: changed
       description: "Update python to 3.11.9-r0"
