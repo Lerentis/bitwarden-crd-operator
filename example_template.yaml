@@ -1,5 +1,5 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
 kind: BitwardenTemplate
 metadata:
   name: test
