@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.12.0"
+version: "v0.13.0"
 
-appVersion: "0.11.0"
+appVersion: "0.12.0"
 
 keywords:
   - operator
@@ -32,22 +32,22 @@ annotations:
       url: https://github.com/Lerentis/bitwarden-crd-operator
   artifacthub.io/crds: |
     - kind: BitwardenSecret
-      version: v1beta6
+      version: v1beta7
       name: bitwarden-secret
       displayName: Bitwarden Secret
       description: Management Object to create secrets from bitwarden
     - kind: RegistryCredential
-      version: v1beta6
+      version: v1beta7
       name: registry-credential
       displayName: Regestry Credentials
       description: Management Object to create regestry secrets from bitwarden
     - kind: BitwardenTemplate
-      version: v1beta6
+      version: v1beta7
       name: bitwarden-template
       displayName: Bitwarden Template
       description: Management Object to create secrets from a jinja template with a bitwarden lookup
   artifacthub.io/crdsExamples: |
-    - apiVersion: lerentis.uploadfilter24.eu/v1beta6
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta7
       kind: BitwardenSecret
       metadata:
         name: test
@@ -61,12 +61,13 @@ annotations:
               secretRef: passwordOfUser
         id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
         name: "test-secret"
+        secretType: Obaque #Optional
         namespace: "default"
         labels:
           key: value
         annotations:
           key: value
-    - apiVersion: lerentis.uploadfilter24.eu/v1beta6
+    - apiVersion: lerentis.uploadfilter24.eu/v1beta7
       kind: RegistryCredential
       metadata:
         name: test
@@ -81,13 +82,14 @@ annotations:
           key: value
         annotations:
           key: value
-    - apiVersion: "lerentis.uploadfilter24.eu/v1beta6"
+    - apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
       kind: BitwardenTemplate
       metadata:
         name: test
       spec:
         filename: "config.yaml"
         name: "test-regcred"
+        secretType: Obaque #Optional
         namespace: "default"
         labels:
           key: value
@@ -107,22 +109,12 @@ annotations:
   artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
-      description: "Update python to 3.11.9-r0"
-    - kind: changed
-      description: "Update Node to 20.12.1-r0"
-    - kind: changed
-      description: "Update libcrypto3 to 3.1.4-r5"
-    - kind: changed
-      description: "Update alpine to 3.19.1"
-    - kind: changed
-      description: "Update kopf to 1.37.2"
-    - kind: changed
-      description: "Update jinja to 3.1.4"
     - kind: added
-      description: "Allow custom annotations to generated secrets"
+      description: "Allow custom type for generated secrets"
     - kind: added
-      description: "Set ownership of generated secrets if CRD is in the same namespace"
+      description: "Allow attachments in generated secrets"
+    - kind: added
+      description: "Allow custom type in templated secrets"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: ghcr.io/lerentis/bitwarden-crd-operator:0.11.0
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.12.0

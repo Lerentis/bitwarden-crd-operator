@@ -56,25 +56,29 @@ And you are set to create your first secret using this operator. For that you ne
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
 kind: BitwardenSecret
 metadata:
   name: name-of-your-management-object
 spec:
   content:
     - element:
-        secretName: nameOfTheFieldInBitwarden # for example username
+        secretName: nameOfTheFieldInBitwarden # for example username or filename
         secretRef: nameOfTheKeyInTheSecretToBeCreated 
-        secretScope: login # for custom entries on bitwarden use 'fields' 
+        secretScope: login # for custom entries on bitwarden use 'fields, for attachments use attachment' 
     - element:
-        secretName: nameOfAnotherFieldInBitwarden # for example password
+        secretName: nameOfAnotherFieldInBitwarden # for example password or filename
         secretRef: nameOfAnotherKeyInTheSecretToBeCreated 
-        secretScope: login # for custom entries on bitwarden use 'fields' 
+        secretScope: login # for custom entries on bitwarden use 'fields, for attachments use attachment' 
   id: "A Secret ID from bitwarden"
   name: "Name of the secret to be created"
+  secretType: # Optional (Default: Opaque)
   namespace: "Namespace of the secret to be created"
   labels: # Optional
     key: value
+  annotations: # Optional
+    key: value
+
 ```
 
 The ID can be extracted from the browser when you open a item the ID is in the URL. The resulting secret looks something like this:
@@ -102,7 +106,7 @@ For managing registry credentials, or pull secrets, you can create another kind 
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
 kind: RegistryCredential
 metadata:
   name: name-of-your-management-object
@@ -114,6 +118,8 @@ spec:
   name: "Name of the secret to be created"
   namespace: "Namespace of the secret to be created"
   labels: # Optional
+    key: value
+  annotations: # Optional
     key: value
 ```
 
@@ -141,15 +147,18 @@ One of the more freely defined types that can be used with this operator you can
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta5"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
 kind: BitwardenTemplate
 metadata:
   name: name-of-your-management-object
 spec:
   filename: "Key of the secret to be created"
   name: "Name of the secret to be created"
+  secretType: # Optional (Default: Opaque)
   namespace: "Namespace of the secret to be created"
   labels: # Optional
+    key: value
+  annotations: # Optional
     key: value
   template: |
     ---
