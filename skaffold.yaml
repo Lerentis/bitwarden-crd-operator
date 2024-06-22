@@ -1,4 +1,4 @@
-apiVersion: skaffold/v4beta5
+apiVersion: skaffold/v4beta9
 kind: Config
 metadata:
   name: bitwarden-crd-operator
@@ -13,5 +13,12 @@ deploy:
       - name: bitwarden-crd-operator
         chartPath: charts/bitwarden-crd-operator
         valuesFiles:
-          - env/values.yaml
-        version: v0.13.0
+          - ./charts/bitwarden-crd-operator/myvalues.yaml
+        setValueTemplates:
+          image.repository: "{{.IMAGE_REPO_ghcr_io_lerentis_bitwarden_crd_operator}}"
+          image.tag: "{{.IMAGE_TAG_ghcr_io_lerentis_bitwarden_crd_operator}}@{{.IMAGE_DIGEST_ghcr_io_lerentis_bitwarden_crd_operator}}"
+test:
+  - image: ghcr.io/lerentis/bitwarden-crd-operator
+    custom:
+      - command: ./utils/test.sh
+        timeoutSeconds: 60
