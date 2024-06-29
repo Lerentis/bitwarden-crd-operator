@@ -9,9 +9,6 @@ build:
     - image: ghcr.io/lerentis/bitwarden-crd-operator
       docker:
         dockerfile: Dockerfile
-    - image: integration-test-container
-      docker:
-        dockerfile: Dockerfile.test
 deploy:
   helm:
     releases:
@@ -22,10 +19,39 @@ deploy:
         setValueTemplates:
           image.repository: "{{.IMAGE_REPO_ghcr_io_lerentis_bitwarden_crd_operator}}"
           image.tag: "{{.IMAGE_TAG_ghcr_io_lerentis_bitwarden_crd_operator}}@{{.IMAGE_DIGEST_ghcr_io_lerentis_bitwarden_crd_operator}}"
-verify:
-  - name: integration-test-container
-    container:
-      name: integration-test-container
-      image: "integration-test-container:a11852f8bb9bf99553238e1fa29206421c72801df5da96ccf9f77ebd069f815f"
-    executionMode:
-      kubernetesCluster: {}
+    hooks:
+      after:
+        - host:
+            command:
+              - kubectl
+              - apply
+              - -f
+              - ./example*.yaml
+        - host:
+            command:
+              - sleep
+              - '5'
+        - host:
+            command:
+              - kubectl
+              - get
+              - secret
+              - test-regcred
+        - host:
+            command:
+              - kubectl
+              - get
+              - secret
+              - test-scope
+        - host:
+            command:
+              - kubectl
+              - get
+              - secret
+              - test-secret
+        - host:
+            command:
+              - kubectl
+              - get
+              - secret
+              - test-template
