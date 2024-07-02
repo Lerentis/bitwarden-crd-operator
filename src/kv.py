@@ -112,7 +112,7 @@ def update_managed_secret(
             body.metadata.annotations['kopf.zalando.org/last-handled-configuration'])
         old_secret_name = old_config['spec'].get('name')
         old_secret_namespace = old_config['spec'].get('namespace')
-        old_secret_type = old_config['spec'].get('type')
+        old_secret_type = old_config['spec'].get('secretType')
     secret_name = spec.get('name')
     secret_namespace = spec.get('namespace')
     labels = spec.get('labels')
@@ -121,6 +121,9 @@ def update_managed_secret(
 
     if not custom_secret_type:
         custom_secret_type = 'Opaque'
+
+    if not old_secret_type:
+        old_secret_type = 'Opaque'
 
     if old_config is not None and (
             old_secret_name != secret_name or old_secret_namespace != secret_namespace or old_secret_type != custom_secret_type):
