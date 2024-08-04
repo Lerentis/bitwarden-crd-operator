@@ -1,4 +1,4 @@
-FROM alpine:3.19.1
+FROM alpine:3.20.2
 
 LABEL org.opencontainers.image.source=https://github.com/Lerentis/bitwarden-crd-operator
 LABEL org.opencontainers.image.description="Kubernetes Operator to create k8s secrets from bitwarden"
