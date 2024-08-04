@@ -4,7 +4,6 @@ import kopf
 import schedule
 import time
 import threading
-import datetime
 
 from utils.utils import command_wrapper, unlock_bw, sync_bw
 
@@ -20,10 +19,6 @@ def bitwarden_signin(logger, **kwargs):
         logger.info("BW_HOST not set. Assuming SaaS installation")
     command_wrapper(logger, "login --apikey")
     unlock_bw(logger)
-
-@kopf.on.probe(id='now')
-def get_current_timestamp(**kwargs):
-    return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 def run_continuously(interval=30):
     cease_continuous_run = threading.Event()

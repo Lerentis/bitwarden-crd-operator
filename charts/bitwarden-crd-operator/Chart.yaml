@@ -110,9 +110,17 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
-      description: "Dedicated probe handler to reduce logging noise"
-    - kind: changed
       description: "Update Alpine to 3.20.2"
+    - kind: changed
+      description: "Update Python to 3.12.3-r1"
+    - kind: changed
+      description: "Update Pip to 24.0-r2"
+    - kind: changed
+      description: "Update NodeJS to 20.15.1-r0"
+    - kind: changed
+      description: "Update libcrypto3 to 3.3.1-r3"
+    - kind: changed
+      description: "Update BitwardenCLI to 2024.7.2"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: ghcr.io/lerentis/bitwarden-crd-operator:0.13.0
