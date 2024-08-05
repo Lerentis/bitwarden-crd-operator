@@ -36,7 +36,7 @@ jobs:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Get app version from chart
-        uses: mikefarah/yq@v4.44.2
+        uses: mikefarah/yq@v4.44.3
         id: app_version
         with:
           cmd: yq '.appVersion' charts/bitwarden-crd-operator/Chart.yaml
