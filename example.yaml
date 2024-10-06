@@ -1,5 +1,5 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta8"
 kind: BitwardenSecret
 metadata:
   name: test
@@ -24,7 +24,7 @@ spec:
   annotations:
     custom.annotation: is-used
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta8"
 kind: BitwardenSecret
 metadata:
   name: test-scope

@@ -1,10 +1,9 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta8"
 kind: BitwardenTemplate
 metadata:
   name: test
 spec:
-  filename: "config.yaml"
   name: "test-template"
   namespace: "default"
   labels:
@@ -12,13 +11,28 @@ spec:
     app: example-app
   annotations:
     custom.annotation: is-used
-  template: |
-    ---
-    api:
-      enabled: True
-      key: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "key") }}
-      allowCrossOrigin: false
-      apps:
-        "some.app.identifier:some_version":
-          pubkey: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "public_key") }}
-          enabled: true
+  content:
+    - element:
+        filename: config.yaml
+        template: |
+          ---
+          api:
+            enabled: True
+            key: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "key") }}
+            allowCrossOrigin: false
+            apps:
+              "some.app.identifier:some_version":
+                pubkey: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "public_key") }}
+                enabled: true
+    - element:
+        filename: config2.yaml
+        template: |
+          ---
+          api:
+            enabled: True
+            key: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "key") }}
+            allowCrossOrigin: false
+            apps:
+              "some.app.identifier:some_version":
+                pubkey: {{ bitwarden_lookup("466fc4b0-ffca-4444-8d88-b59d4de3d928", "fields", "public_key") }}
+                enabled: false

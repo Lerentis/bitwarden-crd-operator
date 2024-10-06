@@ -1,5 +1,5 @@
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta8"
 kind: RegistryCredential
 metadata:
   name: test
