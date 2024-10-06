@@ -4,7 +4,7 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.15.0"
+version: "v0.15.1"
 
 appVersion: "0.14.0"
 
@@ -112,14 +112,8 @@ annotations:
   artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: changed
-      description: "BitwardenTemplate can now handle multiple files"
-    - kind: changed
-      description: "Removed long deprecated versions"
-    - kind: changed
-      description: "Update kubernetes from v29.0.0 to v30.1.0"
-    - kind: changed
-      description: "Update alpine from 3.20.2 to 3.20.3"
+    - kind: fixed
+      description: "Revert Removed long deprecated versions"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: ghcr.io/lerentis/bitwarden-crd-operator:0.14.0
