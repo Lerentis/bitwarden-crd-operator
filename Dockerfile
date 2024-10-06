@@ -1,13 +1,13 @@
-FROM alpine:3.20.2
+FROM alpine:3.20.3
 
 LABEL org.opencontainers.image.source=https://github.com/Lerentis/bitwarden-crd-operator
 LABEL org.opencontainers.image.description="Kubernetes Operator to create k8s secrets from bitwarden"
 LABEL org.opencontainers.image.licenses=MIT
 
-ARG PYTHON_VERSION=3.12.3-r1
+ARG PYTHON_VERSION=3.12.6-r0
 ARG PIP_VERSION=24.0-r2
 ARG GCOMPAT_VERSION=1.1.0-r4
-ARG LIBCRYPTO_VERSION=3.3.1-r3
+ARG LIBCRYPTO_VERSION=3.3.2-r0
 ARG BW_VERSION=2024.7.2
 ARG NODE_VERSION=20.15.1-r0
 

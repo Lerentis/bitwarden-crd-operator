@@ -56,7 +56,7 @@ And you are set to create your first secret using this operator. For that you ne
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta8"
 kind: BitwardenSecret
 metadata:
   name: name-of-your-management-object
@@ -106,7 +106,7 @@ For managing registry credentials, or pull secrets, you can create another kind 
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta8"
 kind: RegistryCredential
 metadata:
   name: name-of-your-management-object
@@ -147,12 +147,11 @@ One of the more freely defined types that can be used with this operator you can
 
 ```yaml
 ---
-apiVersion: "lerentis.uploadfilter24.eu/v1beta7"
+apiVersion: "lerentis.uploadfilter24.eu/v1beta8"
 kind: BitwardenTemplate
 metadata:
   name: name-of-your-management-object
 spec:
-  filename: "Key of the secret to be created"
   name: "Name of the secret to be created"
   secretType: # Optional (Default: Opaque)
   namespace: "Namespace of the secret to be created"
@@ -160,16 +159,31 @@ spec:
     key: value
   annotations: # Optional
     key: value
-  template: |
-    ---
-    api:
-      enabled: True
-      key: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
-      allowCrossOrigin: false
-      apps:
-        "some.app.identifier:some_version":
-          pubkey: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
-          enabled: true
+  content:
+    - element:
+        filename: config.yaml
+        template: |
+          ---
+          api:
+            enabled: True
+            key: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
+            allowCrossOrigin: false
+            apps:
+              "some.app.identifier:some_version":
+                pubkey: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
+                enabled: true
+    - element:
+        filename: config2.yaml
+        template: |
+          ---
+          api:
+            enabled: True
+            key: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
+            allowCrossOrigin: false
+            apps:
+              "some.app.identifier:some_version":
+                pubkey: {{ bitwarden_lookup("A Secret ID from bitwarden", "login or fields or attachment", "name of a field in bitwarden") }}
+                enabled: false
 ```
 
 This will result in something like the following object:
