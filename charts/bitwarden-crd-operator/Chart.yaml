@@ -116,7 +116,7 @@ annotations:
       description: "BitwardenTemplate can now handle multiple files"
     - kind: changed
       description: "Removed long deprecated versions"
-    - kind changed
+    - kind: changed
       description: "Update kubernetes from v29.0.0 to v30.1.0"
     - kind: changed
       description: "Update alpine from 3.20.2 to 3.20.3"
