@@ -13,6 +13,87 @@ spec:
     shortNames:
       - bwt
   versions:
+    - name: v1beta4
+      served: true
+      storage: false
+      deprecated: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                filename:
+                  type: string
+                template:
+                  type: string
+                namespace:
+                  type: string
+                name:
+                  type: string
+              required:
+                - filename
+                - template
+                - namespace
+                - name
+    - name: v1beta5
+      served: true
+      storage: false
+      deprecated: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                filename:
+                  type: string
+                template:
+                  type: string
+                namespace:
+                  type: string
+                name:
+                  type: string
+                labels:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              required:
+                - filename
+                - template
+                - namespace
+                - name
+    - name: v1beta6
+      served: true
+      storage: false
+      deprecated: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                filename:
+                  type: string
+                template:
+                  type: string
+                namespace:
+                  type: string
+                name:
+                  type: string
+                labels:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                annotations:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              required:
+                - filename
+                - template
+                - namespace
+                - name
     - name: v1beta7
       served: true
       storage: false
