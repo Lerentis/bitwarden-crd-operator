@@ -1,15 +1,15 @@
-FROM alpine:3.20.3
+FROM alpine:3.22.0
 
 LABEL org.opencontainers.image.source=https://github.com/Lerentis/bitwarden-crd-operator
 LABEL org.opencontainers.image.description="Kubernetes Operator to create k8s secrets from bitwarden"
 LABEL org.opencontainers.image.licenses=MIT
 
-ARG PYTHON_VERSION=3.12.6-r0
-ARG PIP_VERSION=24.0-r2
+ARG PYTHON_VERSION=3.12.11-r0
+ARG PIP_VERSION=25.1.1-r0
 ARG GCOMPAT_VERSION=1.1.0-r4
-ARG LIBCRYPTO_VERSION=3.3.2-r0
-ARG BW_VERSION=2024.7.2
-ARG NODE_VERSION=20.15.1-r0
+ARG LIBCRYPTO_VERSION=3.5.0-r0
+ARG BW_VERSION=2025.5.0
+ARG NODE_VERSION=22.16.0-r2
 
 COPY requirements.txt /requirements.txt
 
@@ -17,7 +17,7 @@ RUN set -eux; \
     apk update; \
     apk del nodejs-current; \
     apk add nodejs=${NODE_VERSION} npm; \
-    npm install -g @bitwarden/cli@${BW_VERSION}; \
+    npm install -g @bitwarden/cli@${BW_VERSION} semver; \
     addgroup -S -g 1000 bw-operator; \
     adduser -S -D -u 1000 -G bw-operator bw-operator; \
     mkdir -p /home/bw-operator; \
