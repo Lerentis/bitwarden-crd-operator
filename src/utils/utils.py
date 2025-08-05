@@ -18,25 +18,27 @@ def get_secret_from_bitwarden(logger, id, force_sync=False):
 def sync_bw(logger, force=False):
 
     def _sync(logger):
-        status_output = command_wrapper(logger, command=f"sync")
-        logger.info(f"Sync successful {status_output}")
+        status = command_wrapper(logger, command=f"sync")
+        if status is None:
+            logger.info(f"Sync failed, retrying in {bw_sync_interval} seconds")
         return
 
     if force:
         _sync(logger)
+        if "DEBUG" in dict(os.environ):
+            logger.info("running with regular force sync enabled")
         return
 
     global_force_sync = bool(distutils.util.strtobool(
         os.environ.get('BW_FORCE_SYNC', "false")))
 
     if global_force_sync:
-        logger.debug("Running forced sync")
-        status_output = _sync(logger)
-        logger.info(f"Sync successful {status_output}")
+        _sync(logger)
+        if "DEBUG" in dict(os.environ):
+            logger.info("Running with global force sync")
+
     else:
-        logger.debug("Running scheduled sync")
-        status_output = _sync(logger)
-        logger.info(f"Sync successful {status_output}")
+        _sync(logger)
 
 
 def get_attachment(logger, id, name):

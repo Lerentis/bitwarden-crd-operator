@@ -10,7 +10,24 @@ from utils.utils import command_wrapper, unlock_bw, sync_bw
 def bitwarden_signin(logger, **kwargs):
     if 'BW_HOST' in os.environ:
         try:
-            command_wrapper(logger, f"config server {os.getenv('BW_HOST')}")
+            home_dir = os.path.expanduser("~")
+            bw_host_file = os.path.join(home_dir, ".bw_host")
+            bw_host_env = os.getenv('BW_HOST')
+            if os.path.isfile(bw_host_file):
+                with open(bw_host_file, "r") as f:
+                    saved_host = f.read().strip()
+                if saved_host == bw_host_env:
+                    if "DEBUG" in dict(os.environ):
+                        logger.info("BW_HOST unchanged, skipping config server command")
+                else:
+                    command_wrapper(logger, "logout")
+                    command_wrapper(logger, f"config server {bw_host_env}")
+                    with open(bw_host_file, "w") as f:
+                        f.write(bw_host_env)
+            else:
+                command_wrapper(logger, f"config server {bw_host_env}")
+                with open(bw_host_file, "w") as f:
+                    f.write(bw_host_env)
         except BaseException:
             logger.warn("Received non-zero exit code from server config")
             logger.warn("This is expected from startup")
