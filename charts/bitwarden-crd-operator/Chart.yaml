@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.15.2"
+version: "v0.16.0"
 
-appVersion: "0.14.1"
+appVersion: "0.15.0"
 
 keywords:
   - operator
@@ -113,25 +113,9 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
     - kind: changed
-      description: "Updated alpine from 3.20.3 to 3.22.0"
+      description: "Enhanced signin for custom domains and improved error handling"
     - kind: changed
-      description: "Updated Python from 3.12.6 to 3.12.11"
-    - kind: changed
-      description: "Updated pip from 24.0 to 25.1.1"
-    - kind: changed
-      description: "Updated libcrypto from 3.3.2 to 3.5.0"
-    - kind: changed
-      description: "Updated Bitwarden CLI from 2024.7.2 to 2025.5.0"
-    - kind: changed
-      description: "Updated Node.js from 20.15.1 to 22.16.0"
-    - kind: changed
-      description: "Updated kopf from 1.37.2 to 1.38.0"
-    - kind: changed
-      description: "Updated kubernetes from 30.1.0 to 33.1.0"
-    - kind: changed
-      description: "Updated Jinja2 from 3.1.4 to 3.1.6"
-    - kind: added
-      description: "Added semver to global npm packages as it is required by the Bitwarden CLI"
+      description: "Dropped redundant log lines in sync handler"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: ghcr.io/lerentis/bitwarden-crd-operator:0.14.1
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.15.0
