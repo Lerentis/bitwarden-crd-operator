@@ -49,7 +49,8 @@ def unlock_bw(logger):
     status_output = command_wrapper(logger, "status", False)
     status = status_output['data']['template']['status']
     if status == 'unlocked':
-        logger.info("Already unlocked")
+        if "DEBUG" in dict(os.environ):
+            logger.info("Already unlocked")
         return
     token_output = command_wrapper(logger, "unlock --passwordenv BW_PASSWORD")
     os.environ["BW_SESSION"] = token_output["data"]["raw"]
