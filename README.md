@@ -6,7 +6,7 @@
   <img src="logo.png" alt="Bitwarden CRD Operator Logo" width="200"/>
 </p>
 
-A Kubernetes operator that synchronizes secrets from Bitwarden into Kubernetes Secret objects. Built with [kopf](https://github.com/nolar/kopf/) and powered by [rbw](https://github.com/doy/rbw), this operator enables GitOps-friendly secret management by allowing you to define secrets as Kubernetes Custom Resources while keeping sensitive data secure in Bitwarden.
+A Kubernetes operator that synchronizes secrets from Bitwarden into Kubernetes Secret objects. Built with [kopf](https://github.com/nolar/kopf/) and powered by the Bitwarden CLI, this operator enables GitOps-friendly secret management by allowing you to define secrets as Kubernetes Custom Resources while keeping sensitive data secure in Bitwarden.
 
 ## Features
 
@@ -17,17 +17,17 @@ A Kubernetes operator that synchronizes secrets from Bitwarden into Kubernetes S
 - 🏷️ **Custom Labels & Annotations** - Add metadata to generated secrets
 - 🗑️ **Garbage Collection** - Automatic cleanup of managed secrets when CRDs are deleted
 - 🔒 **Self-hosted & SaaS** - Works with both Bitwarden SaaS and self-hosted instances
-- ⚡ **Efficient Agent** - Uses rbw's background agent for improved performance and security
+- ⚡ **Efficient CLI usage** - Uses the Bitwarden CLI efficiently for session handling and syncs
 
-> **Note:** This operator uses [rbw](https://github.com/doy/rbw), an unofficial Bitwarden CLI with an agent-based architecture, providing better state management and security compared to the official CLI.
+> **Note:** This operator uses the Bitwarden CLI. For local testing you can install it from the official project or use the bundled CLI inside the operator image.
 
-> **⚠️ Breaking Change:** Version 1.x+ uses rbw instead of the official Bitwarden CLI. If you're upgrading from an older version, please see the [Migration Guide](MIGRATION_TO_RBW.md) for detailed instructions on updating your configuration from `BW_*` to `RBW_*` environment variables.
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
+  - [Wording](#wording)
   - [BitwardenSecret](#bitwardensecret)
   - [RegistryCredential](#registrycredential)
   - [BitwardenTemplate](#bitwardentemplate)
@@ -42,12 +42,13 @@ Before installing the operator, you'll need:
 2. **Email Address** - Your Bitwarden account email
 3. **Master Password** - Your Bitwarden master password
 4. **Kubernetes Cluster** - Version 1.16+ recommended
-5. **rbw CLI** - The operator container includes rbw, but for local testing you can install it from [here](https://github.com/doy/rbw)
+5. **Bitwarden CLI** - The operator container includes the Bitwarden CLI, but for local testing you can install it from the official Bitwarden CLI releases or your package manager
 
 ## Installation
 
 ### Step 1: Prepare Credentials
 
+You will need a `ClientID` and `ClientSecret` ([where to get these](https://bitwarden.com/help/personal-api-key/)) as well as your password.  
 You have two options for providing Bitwarden credentials:
 
 #### Option A: Using Helm Values (Quick Start)
@@ -56,16 +57,21 @@ Create a `values.yaml` file:
 
 ```yaml
 env:
-  - name: RBW_EMAIL
+  - name: BW_EMAIL
     value: "your-email@example.com"
-  - name: RBW_PASSWORD
+  - name: BW_PASSWORD
     value: "YourSuperSecurePassword"
+  - name: BW_CLIENTID
+    value: "user.your-client-id"
+  - name: BW_CLIENTSECRET
+    value: "YoUrCliEntSecRet"
   # Optional: for self-hosted Bitwarden
-  - name: RBW_BASE_URL
+  - name: BW_HOST
     value: "https://bitwarden.your.tld.org"
   # Optional: custom identity URL
-  - name: RBW_IDENTITY_URL
+  - name: BW_IDENTITY_URL
     value: "https://identity.your.tld.org"
+x
 ```
 
 #### Option B: Using Existing Secret (Recommended for Production)
@@ -77,10 +83,12 @@ kubectl create namespace bw-operator
 
 kubectl create secret generic bitwarden-credentials \
   --namespace bw-operator \
-  --from-literal=RBW_EMAIL='your-email@example.com' \
-  --from-literal=RBW_PASSWORD='YourSuperSecurePassword'
+  --from-literal=BW_EMAIL='your-email@example.com' \
+  --from-literal=BW_PASSWORD='YourSuperSecurePassword' \
+  --from-literal=BW_CLIENTID='user.your-client-id' \
+  --from-literal=BW_CLIENTSECRET='YoUrCliEntSecRet'
   # Optional for self-hosted:
-  # --from-literal=RBW_BASE_URL='https://bitwarden.your.tld.org'
+  # --from-literal=BW_HOST='https://bitwarden.your.tld.org'
 ```
 
 Then reference it in `values.yaml`:
@@ -120,6 +128,43 @@ kubectl logs -n bw-operator -l app.kubernetes.io/name=bitwarden-crd-operator
 ```
 
 ## Usage
+
+### Wording
+
+The Bitwarden API distinguishes between simple login entries (username/password), custom fields, and attachments; the operator exposes these via the `secretScope` setting to control how items are mapped into Kubernetes Secrets.
+
+- login — Use when you need the entry's username or password; specify `secretScope: login` .
+- fields — Use for custom key/value fields stored on an item; specify `secretScope: fields` .
+- attachment — Use for files attached to a Bitwarden item; specify `secretScope: attachment` .
+
+#### Examples
+
+Login entry:
+
+```yaml
+  - element:
+      secretName: username
+      secretRef: my-username-key
+      secretScope: login
+```
+
+Custom field:
+
+```yaml
+  - element:
+      secretName: api_key
+      secretRef: my-api-key
+      secretScope: fields
+```
+
+Attachment (file):
+
+```yaml
+  - element:
+      secretName: some-file.txt
+      secretRef: file-key
+      secretScope: attachment
+```
 
 ### BitwardenSecret
 
@@ -393,49 +438,50 @@ The operator can be configured using environment variables, either directly in `
 
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
-| `RBW_EMAIL` | Bitwarden account email address | - | Yes |
-| `RBW_PASSWORD` | Bitwarden master password | - | Yes |
-| `RBW_BASE_URL` | Bitwarden server URL (for self-hosted) | `https://api.bitwarden.com/` | No |
-| `RBW_IDENTITY_URL` | Bitwarden identity server URL | Auto-configured | No |
-| `RBW_SYNC_INTERVAL` | How often to sync with Bitwarden (seconds) | `900` (15 min) | No |
-| `RBW_LOCK_TIMEOUT` | How long to keep vault unlocked (seconds) | `3600` (1 hour) | No |
-| `RBW_FORCE_SYNC` | Force sync before every secret retrieval | `false` | No |
+| `BW_EMAIL` | Bitwarden account email address | - | Yes |
+| `BW_PASSWORD` | Bitwarden master password | - | Yes |
+| `BW_HOST` | Bitwarden server URL (for self-hosted) | `https://api.bitwarden.com/` | No |
+| `BW_CLIENTID` | OAuth client ID (optional for some deployments) | - | No |
+| `BW_CLIENTSECRET` | OAuth client secret (optional) | - | No |
+| `BW_SYNC_INTERVAL` | How often to sync with Bitwarden (seconds) | `900` (15 min) | No |
+| `BW_RELOGIN_INTERVAL` | How long to keep session unlocked / re-login interval (seconds) | `3600` (1 hour) | No |
+| `BW_FORCE_SYNC` | Force sync before every secret retrieval | `false` | No |
 | `DEBUG` | Enable debug logging | - | No |
 
 ### Sync Behavior
 
-The operator uses [rbw](https://github.com/doy/rbw), which maintains a background agent with intelligent caching:
+The operator interacts with the Bitwarden CLI and may perform syncs according to the configured interval:
 
-- **Normal Mode** (`RBW_FORCE_SYNC=false`): Manual syncs triggered every `RBW_SYNC_INTERVAL` seconds (default: 15 minutes)
-- **Force Sync Mode** (`RBW_FORCE_SYNC=true`): Syncs before every secret retrieval
-- **Automatic Background Sync**: rbw's agent also performs periodic syncs based on `RBW_SYNC_INTERVAL`
+- **Normal Mode** (`BW_FORCE_SYNC=false`): Periodic syncs based on `BW_SYNC_INTERVAL` seconds (default: 15 minutes)
+- **Force Sync Mode** (`BW_FORCE_SYNC=true`): Syncs before every secret retrieval
+- **Automatic Background Sync**: The Bitwarden CLI may also perform periodic syncs depending on its configuration
 
-⚠️ **Warning:** Enabling `RBW_FORCE_SYNC` can lead to rate limiting if you have many secrets or frequent updates. Use with caution.
+⚠️ **Warning:** Enabling `BW_FORCE_SYNC` can lead to rate limiting if you have many secrets or frequent updates. Use with caution.
 
 ### Session Management
 
-Unlike the official Bitwarden CLI, rbw uses a persistent background agent that handles session management automatically:
+The operator relies on the Bitwarden CLI for session handling:
 
-- The agent keeps the vault unlocked for `RBW_LOCK_TIMEOUT` seconds (default: 1 hour)
-- No manual re-login required - the agent manages authentication state
-- More secure than environment variable-based session tokens
+- The CLI may keep sessions unlocked for a configured interval (`BW_RELOGIN_INTERVAL`)
+- The operator assumes the CLI handles authentication state; adjust `BW_RELOGIN_INTERVAL` or credentials as needed
+- No manual re-login should be required when the CLI session is valid
 
 ### Example Configuration
 
 ```yaml
 # values.yaml
 env:
-  - name: RBW_EMAIL
+  - name: BW_EMAIL
     value: "vault-operator@example.com"
-  - name: RBW_PASSWORD
+  - name: BW_PASSWORD
     value: "your-master-password"
   # Optional: For self-hosted Bitwarden
-  - name: RBW_BASE_URL
+  - name: BW_HOST
     value: "https://vault.example.com"
-  - name: RBW_SYNC_INTERVAL
+  - name: BW_SYNC_INTERVAL
     value: "600"  # Sync every 10 minutes
-  - name: RBW_LOCK_TIMEOUT
-    value: "7200"  # Keep unlocked for 2 hours
+  - name: BW_RELOGIN_INTERVAL
+    value: "7200"  # Keep session or re-login interval for 2 hours
   - name: DEBUG
     value: "true"  # Enable debug logging
 ```
@@ -464,15 +510,14 @@ kubectl logs -n bw-operator -l app.kubernetes.io/name=bitwarden-crd-operator -f
 - Ensure the target namespace exists
 
 **Authentication failures:**
-- Verify `RBW_EMAIL` and `RBW_PASSWORD` are correct
-- Check if `RBW_BASE_URL` is needed (for self-hosted instances)
-- Ensure rbw agent is running (check logs for "rbw unlocked successfully")
+- Verify `BW_EMAIL` and `BW_PASSWORD` are correct
+- Check if `BW_HOST` is needed (for self-hosted instances)
+- Ensure the Bitwarden CLI is installed and accessible (check logs for "Signin successful. Session exported" or "Already unlocked")
 
 **Secrets not updating:**
-- Check `RBW_SYNC_INTERVAL` setting
+- Check `BW_SYNC_INTERVAL` setting
 - Verify the operator pod is running
 - Look for sync errors in logs
-- Ensure vault is unlocked (check `RBW_LOCK_TIMEOUT`)
 
 ### Garbage Collection
 
