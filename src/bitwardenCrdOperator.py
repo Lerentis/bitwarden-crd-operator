@@ -53,12 +53,12 @@ def run_continuously(interval=30):
 
 @kopf.on.startup()
 def load_schedules(logger, **kwargs):
-    bitwarden_signin(logger)
     logger.info("Loading schedules")
-    bw_relogin_interval = float(os.environ.get('BW_RELOGIN_INTERVAL', 3600))
+    bitwarden_signin(logger)
+
     bw_sync_interval = float(os.environ.get('BW_SYNC_INTERVAL', 900))
+    bw_relogin_interval = float(os.environ.get('BW_RELOGIN_INTERVAL', 3600))
+
     schedule.every(bw_relogin_interval).seconds.do(bitwarden_signin, logger=logger)
-    logger.info(f"relogin scheduled every {bw_relogin_interval} seconds")
     schedule.every(bw_sync_interval).seconds.do(sync_bw, logger=logger)
-    logger.info(f"sync scheduled every {bw_relogin_interval} seconds")
-    stop_run_continuously = run_continuously()
+    run_continuously()

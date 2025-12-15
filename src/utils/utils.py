@@ -2,6 +2,8 @@ import os
 import json
 import subprocess
 import distutils
+import kubernetes
+import kopf
 
 bw_sync_interval = float(os.environ.get(
     'BW_SYNC_INTERVAL', 900))
@@ -16,7 +18,6 @@ def get_secret_from_bitwarden(logger, id, force_sync=False):
 
 
 def sync_bw(logger, force=False):
-
     def _sync(logger):
         status = command_wrapper(logger, command=f"sync")
         if status is None:
@@ -26,7 +27,7 @@ def sync_bw(logger, force=False):
     if force:
         _sync(logger)
         if "DEBUG" in dict(os.environ):
-            logger.info("running with regular force sync enabled")
+            logger.info("Running with regular force sync enabled")
         return
 
     global_force_sync = bool(distutils.util.strtobool(
@@ -36,7 +37,6 @@ def sync_bw(logger, force=False):
         _sync(logger)
         if "DEBUG" in dict(os.environ):
             logger.info("Running with global force sync")
-
     else:
         _sync(logger)
 
@@ -92,3 +92,101 @@ def parse_fields_scope(secret_json, key):
     for entry in secret_json["data"]["fields"]:
         if entry['name'] == key:
             return entry['value']
+
+
+# Common secret management functions
+def build_secret_metadata(secret_name, managed_type, namespace, name, custom_annotations=None, labels=None):
+    """Build common secret metadata with annotations and labels."""
+    annotations = {
+        "managed": managed_type,
+        "managedObject": f"{namespace}/{name}"
+    }
+    
+    if custom_annotations:
+        annotations.update(custom_annotations)
+    
+    if not labels:
+        labels = {}
+    
+    return kubernetes.client.V1ObjectMeta(
+        name=secret_name, 
+        annotations=annotations, 
+        labels=labels
+    )
+
+
+def extract_secret_config(spec):
+    """Extract common secret configuration from spec."""
+    return {
+        'secret_name': spec.get('name'),
+        'secret_namespace': spec.get('namespace'),
+        'labels': spec.get('labels'),
+        'custom_annotations': spec.get('annotations'),
+        'custom_secret_type': spec.get('secretType', 'Opaque')
+    }
+
+
+def parse_old_config(body):
+    """Parse old configuration from body annotations."""
+    if 'kopf.zalando.org/last-handled-configuration' not in body.metadata.annotations:
+        return None, None, None, None
+    
+    old_config = json.loads(
+        body.metadata.annotations['kopf.zalando.org/last-handled-configuration']
+    )
+    old_secret_name = old_config['spec'].get('name')
+    old_secret_namespace = old_config['spec'].get('namespace')
+    old_secret_type = old_config['spec'].get('secretType', 'Opaque')
+    
+    return old_config, old_secret_name, old_secret_namespace, old_secret_type
+
+
+def should_recreate_secret(old_secret_name, secret_name, old_secret_namespace, 
+                           secret_namespace, old_secret_type, secret_type):
+    """Determine if secret should be recreated due to name/namespace/type change."""
+    return (old_secret_name != secret_name or 
+            old_secret_namespace != secret_namespace or 
+            old_secret_type != secret_type)
+
+
+def apply_owner_reference(secret, secret_namespace, namespace):
+    """Apply owner reference if secret is in same namespace."""
+    if secret_namespace == namespace:
+        kopf.append_owner_reference(secret)
+
+
+def delete_secret(logger, secret_name, secret_namespace):
+    """Delete a Kubernetes secret."""
+    api = kubernetes.client.CoreV1Api()
+    
+    try:
+        api.delete_namespaced_secret(secret_name, secret_namespace)
+        logger.info(f"Secret {secret_namespace}/{secret_name} has been deleted")
+    except BaseException:
+        logger.warn(f"Could not delete secret {secret_namespace}/{secret_name}!")
+
+
+def create_secret(logger, secret, secret_namespace):
+    """Create a Kubernetes secret."""
+    api = kubernetes.client.CoreV1Api()
+    api.create_namespaced_secret(
+        namespace=secret_namespace,
+        body=secret
+    )
+    logger.info(f"Secret {secret_namespace}/{secret.metadata.name} has been created")
+
+
+def update_secret(logger, secret, secret_namespace):
+    """Update a Kubernetes secret."""
+    api = kubernetes.client.CoreV1Api()
+    
+    try:
+        api.replace_namespaced_secret(
+            name=secret.metadata.name,
+            body=secret,
+            namespace=secret_namespace
+        )
+        logger.info(f"Secret {secret_namespace}/{secret.metadata.name} has been updated")
+    except BaseException as e:
+        logger.warn(f"Could not update secret {secret_namespace}/{secret.metadata.name}!")
+        logger.warn(f"Exception: {e}")

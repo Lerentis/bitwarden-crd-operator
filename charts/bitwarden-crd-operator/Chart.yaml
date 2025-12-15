@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.16.1"
+version: "v0.17.0"
 
-appVersion: "0.15.1"
+appVersion: "0.16.0"
 
 keywords:
   - operator
@@ -112,8 +112,16 @@ annotations:
   artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
+    - kind: changed
+      description: "Refactored source code to reduce code duplication"
     - kind: fixed
-      description: "Missed another redundant log message that has now been dropped to debug mode"
+      description: "Fixed vault unlock logic to properly check status before attempting unlock"
+    - kind: changed
+      description: "Updated Alpine base image to 3.23.0"
+    - kind: changed
+      description: "Updated Node.js to 24.11.1-r0"
+    - kind: changed
+      description: "Updated Python to 3.12.12-r0"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: ghcr.io/lerentis/bitwarden-crd-operator:0.15.1
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.16.0
