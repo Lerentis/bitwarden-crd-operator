@@ -3,6 +3,126 @@ entries:
   bitwarden-crd-operator:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: "Refactored source code to reduce code duplication"
+        - kind: fixed
+          description: "Fixed vault unlock logic to properly check status before attempting unlock"
+        - kind: changed
+          description: "Updated Alpine base image to 3.23.0"
+        - kind: changed
+          description: "Updated Node.js to 24.11.1-r0"
+        - kind: changed
+          description: "Updated Python to 3.12.12-r0"
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/crds: |
+        - kind: BitwardenSecret
+          version: v1beta8
+          name: bitwarden-secret
+          displayName: Bitwarden Secret
+          description: Management Object to create secrets from bitwarden
+        - kind: RegistryCredential
+          version: v1beta8
+          name: registry-credential
+          displayName: Regestry Credentials
+          description: Management Object to create regestry secrets from bitwarden
+        - kind: BitwardenTemplate
+          version: v1beta8
+          name: bitwarden-template
+          displayName: Bitwarden Template
+          description: Management Object to create secrets from a jinja template with a bitwarden lookup
+      artifacthub.io/crdsExamples: |
+        - apiVersion: lerentis.uploadfilter24.eu/v1beta8
+          kind: BitwardenSecret
+          metadata:
+            name: test
+          spec:
+            content:
+              - element:
+                  secretName: username
+                  secretRef: nameofUser
+              - element:
+                  secretName: password
+                  secretRef: passwordOfUser
+            id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+            name: "test-secret"
+            secretType: Obaque #Optional
+            namespace: "default"
+            labels:
+              key: value
+            annotations:
+              key: value
+        - apiVersion: lerentis.uploadfilter24.eu/v1beta8
+          kind: RegistryCredential
+          metadata:
+            name: test
+          spec:
+            usernameRef: "username"
+            passwordRef: "password"
+            registry: "docker.io"
+            id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+            name: "test-regcred"
+            namespace: "default"
+            labels:
+              key: value
+            annotations:
+              key: value
+        - apiVersion: "lerentis.uploadfilter24.eu/v1beta8"
+          kind: BitwardenTemplate
+          metadata:
+            name: test
+          spec:
+            name: "test-regcred"
+            secretType: Obaque #Optional
+            namespace: "default"
+            labels:
+              key: value
+            annotations:
+              key: value
+            content:
+              - element:
+                  filename: "config.yaml"
+                  template: |
+                    ---
+                    api:
+                      enabled: True
+                      key: {{ bitwarden_lookup("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "fields", "key") }}
+                      allowCrossOrigin: false
+                      apps:
+                        "some.app.identifier:some_version":
+                          pubkey: {{ bitwarden_lookup("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "attachment", "public_key") }}
+                          enabled: true
+      artifacthub.io/images: |
+        - name: bitwarden-crd-operator
+          image: ghcr.io/lerentis/bitwarden-crd-operator:0.16.0
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/Lerentis/bitwarden-crd-operator
+      artifacthub.io/operator: "true"
+    apiVersion: v2
+    appVersion: 0.16.0
+    created: "2025-12-15T19:41:17.436869919Z"
+    description: Deploy the Bitwarden CRD Operator
+    digest: 07433653152f69abf9dadf797f87b809e8bb80f721ce8549856ca573681b3e00
+    home: https://lerentis.github.io/bitwarden-crd-operator/
+    icon: https://lerentis.github.io/bitwarden-crd-operator/logo.png
+    keywords:
+    - operator
+    - bitwarden
+    - vaultwarden
+    kubeVersion: '>= 1.28.0-0'
+    maintainers:
+    - email: lerentis+helm@uploadfilter24.eu
+      name: lerentis
+    name: bitwarden-crd-operator
+    sources:
+    - https://github.com/Lerentis/bitwarden-crd-operator
+    type: application
+    urls:
+    - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.17.0/bitwarden-crd-operator-v0.17.0.tgz
+    version: v0.17.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: "Missed another redundant log message that has now been dropped to debug mode"
       artifacthub.io/containsSecurityUpdates: "false"
@@ -3310,4 +3430,4 @@ entries:
     urls:
     - https://github.com/Lerentis/bitwarden-crd-operator/releases/download/bitwarden-crd-operator-v0.2.0/bitwarden-crd-operator-v0.2.0.tgz
     version: v0.2.0
-generated: "2025-08-05T20:54:36.81359347Z"
+generated: "2025-12-15T19:41:17.43713561Z"
