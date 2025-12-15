@@ -72,7 +72,7 @@ def create_managed_secret(spec, name, namespace, logger, body, **kwargs):
 
 
 @kopf.on.update('bitwarden-secret.lerentis.uploadfilter24.eu')
-@kopf.timer('bitwarden.lerentis.uploadfilter24.eu', 'bitwardensecret', interval=bw_sync_interval, initial_delay=10)
+@kopf.timer('bitwarden-secret.lerentis.uploadfilter24.eu', interval=bw_sync_interval, initial_delay=10)
 def update_managed_secret(
         spec,
         status,

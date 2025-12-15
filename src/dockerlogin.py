@@ -76,7 +76,7 @@ def create_managed_registry_secret(spec, name, namespace, logger, **kwargs):
 
 
 @kopf.on.update('registry-credential.lerentis.uploadfilter24.eu')
-@kopf.timer('bitwarden.lerentis.uploadfilter24.eu', 'registrycredential', interval=bw_sync_interval, initial_delay=10)
+@kopf.timer('registry-credential.lerentis.uploadfilter24.eu', interval=bw_sync_interval, initial_delay=10)
 def update_managed_registry_secret(
         spec,
         status,

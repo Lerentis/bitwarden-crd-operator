@@ -138,7 +138,7 @@ def update_beta7_secret(
 
 
 @kopf.on.update('bitwarden-template.lerentis.uploadfilter24.eu')
-@kopf.timer('bitwarden.lerentis.uploadfilter24.eu', 'bitwardentemplate', interval=bw_sync_interval, initial_delay=10)
+@kopf.timer('bitwarden-template.lerentis.uploadfilter24.eu', interval=bw_sync_interval, initial_delay=10)
 def update_managed_secret(
         spec,
         status,
