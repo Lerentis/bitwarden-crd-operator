@@ -74,7 +74,7 @@ jobs:
 
       - name: Get Latest Tag
         id: previoustag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
+        uses: WyriHaximus/github-action-get-previous-tag@v2
 
       - name: Download SBOM from github action
         uses: actions/download-artifact@v7
