@@ -47,12 +47,16 @@ def get_attachment(logger, id, name):
 
 def unlock_bw(logger):
     status_output = command_wrapper(logger, "status", False)
+    if status_output is None:
+        raise BitwardenCommandException("Failed to get bw status")
     status = status_output['data']['template']['status']
     if status == 'unlocked':
         if "DEBUG" in dict(os.environ):
             logger.info("Already unlocked")
         return
     token_output = command_wrapper(logger, "unlock --passwordenv BW_PASSWORD")
+    if token_output is None:
+        raise BitwardenCommandException("Failed to unlock vault")
     os.environ["BW_SESSION"] = token_output["data"]["raw"]
     logger.info("Signin successful. Session exported")
 

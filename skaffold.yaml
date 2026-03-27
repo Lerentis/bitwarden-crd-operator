@@ -30,7 +30,7 @@ deploy:
         - host:
             command:
               - sleep
-              - '5'
+              - '20'
         - host:
             command:
               - kubectl

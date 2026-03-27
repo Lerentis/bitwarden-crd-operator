@@ -34,7 +34,10 @@ def bitwarden_signin(logger, **kwargs):
             pass
     else:
         logger.info("BW_HOST not set. Assuming SaaS installation")
-    command_wrapper(logger, "login --apikey")
+    login_result = command_wrapper(logger, "login --apikey")
+    if login_result is None:
+        logger.error("bw login failed, will retry on next schedule")
+        return
     unlock_bw(logger)
 
 def run_continuously(interval=30):
@@ -51,6 +54,20 @@ def run_continuously(interval=30):
     continuous_thread.start()
     return cease_continuous_run
 
+def safe_bitwarden_signin(logger, **kwargs):
+    """Wrapper for bitwarden_signin that prevents schedule job cancellation on errors."""
+    try:
+        bitwarden_signin(logger, **kwargs)
+    except Exception as e:
+        logger.error(f"Relogin failed: {e}. Will retry on next schedule.")
+
+def safe_sync_bw(logger, **kwargs):
+    """Wrapper for sync_bw that prevents schedule job cancellation on errors."""
+    try:
+        sync_bw(logger, **kwargs)
+    except Exception as e:
+        logger.error(f"Sync failed: {e}. Will retry on next schedule.")
+
 @kopf.on.startup()
 def load_schedules(logger, **kwargs):
     logger.info("Loading schedules")
@@ -59,6 +76,6 @@ def load_schedules(logger, **kwargs):
     bw_sync_interval = float(os.environ.get('BW_SYNC_INTERVAL', 900))
     bw_relogin_interval = float(os.environ.get('BW_RELOGIN_INTERVAL', 3600))
 
-    schedule.every(bw_relogin_interval).seconds.do(bitwarden_signin, logger=logger)
-    schedule.every(bw_sync_interval).seconds.do(sync_bw, logger=logger)
+    schedule.every(bw_relogin_interval).seconds.do(safe_bitwarden_signin, logger=logger)
+    schedule.every(bw_sync_interval).seconds.do(safe_sync_bw, logger=logger)
     run_continuously()
