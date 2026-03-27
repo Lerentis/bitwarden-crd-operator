@@ -120,6 +120,10 @@ annotations:
       description: "Updated Node.js to 24.14.1-r0"
     - kind: changed
       description: "Updated libcrypto3 to 3.5.5-r0"
+    - kind: changed
+      description: "Updated kopf to 1.44.4"
+    - kind: changed
+      description: "Updated kubernetes to 35.0.0"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: ghcr.io/lerentis/bitwarden-crd-operator:0.16.1
