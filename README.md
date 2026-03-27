@@ -445,6 +445,7 @@ The operator can be configured using environment variables, either directly in `
 | `BW_CLIENTSECRET` | OAuth client secret (optional) | - | No |
 | `BW_SYNC_INTERVAL` | How often to sync with Bitwarden (seconds) | `900` (15 min) | No |
 | `BW_RELOGIN_INTERVAL` | How long to keep session unlocked / re-login interval (seconds) | `3600` (1 hour) | No |
+| `BW_AUTH_FAILURE_THRESHOLD` | Consecutive auth failures before forcing logout/cache reset and relogin | `3` | No |
 | `BW_FORCE_SYNC` | Force sync before every secret retrieval | `false` | No |
 | `DEBUG` | Enable debug logging | - | No |
 
@@ -464,6 +465,7 @@ The operator relies on the Bitwarden CLI for session handling:
 
 - The CLI may keep sessions unlocked for a configured interval (`BW_RELOGIN_INTERVAL`)
 - The operator assumes the CLI handles authentication state; adjust `BW_RELOGIN_INTERVAL` or credentials as needed
+- Repeated login/unlock failures can trigger automatic auth recovery based on `BW_AUTH_FAILURE_THRESHOLD`
 - No manual re-login should be required when the CLI session is valid
 
 ### Example Configuration
@@ -482,6 +484,8 @@ env:
     value: "600"  # Sync every 10 minutes
   - name: BW_RELOGIN_INTERVAL
     value: "7200"  # Keep session or re-login interval for 2 hours
+  - name: BW_AUTH_FAILURE_THRESHOLD
+    value: "3"  # Attempt auth recovery after 3 consecutive failures
   - name: DEBUG
     value: "true"  # Enable debug logging
 ```
