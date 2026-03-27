@@ -72,9 +72,11 @@ jobs:
         with:
           sbom-artifact-match: ".*\\.spdx\\.json"
 
-      - name: Get Latest Tag
-        id: previoustag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
+      - name: Get chart version
+        uses: mikefarah/yq@v4.50.1
+        id: chart_version
+        with:
+          cmd: yq '.version' charts/bitwarden-crd-operator/Chart.yaml
 
       - name: Download SBOM from github action
         uses: actions/download-artifact@v7
@@ -87,5 +89,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
           file: lerentis-bitwarden-crd-operator_*.spdx.json
-          tag:  ${{ steps.previoustag.outputs.tag }}
+          tag: bitwarden-crd-operator-${{ steps.chart_version.outputs.result }}
           overwrite: true
