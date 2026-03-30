@@ -11,7 +11,6 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 import bitwardenCrdOperator as operator  # noqa: E402
-from utils.utils import BitwardenCommandException  # noqa: E402
 
 
 class DummyLogger:
@@ -42,24 +41,22 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         os.environ.pop("BW_AUTH_FAILURE_THRESHOLD", None)
         os.environ.pop("BW_SESSION", None)
 
-    @patch("bitwardenCrdOperator.unlock_bw")
     @patch("bitwardenCrdOperator.command_wrapper")
-    def test_signin_success_resets_failure_counter(
-        self, command_wrapper_mock, unlock_bw_mock
-    ):
+    def test_signin_success_resets_failure_counter(self, command_wrapper_mock):
         operator.auth_failures = 2
-        command_wrapper_mock.return_value = {"success": True}
+        command_wrapper_mock.side_effect = [
+            {"success": True},
+            {"data": {"template": {"status": "unlocked"}}},
+        ]
 
         operator.bitwarden_signin(self.logger)
 
         self.assertEqual(operator.auth_failures, 0)
-        unlock_bw_mock.assert_called_once_with(self.logger)
 
     @patch("bitwardenCrdOperator.recover_auth_state")
-    @patch("bitwardenCrdOperator.unlock_bw")
     @patch("bitwardenCrdOperator.command_wrapper")
     def test_signin_failure_below_threshold_does_not_trigger_recovery(
-        self, command_wrapper_mock, unlock_bw_mock, recover_auth_state_mock
+        self, command_wrapper_mock, recover_auth_state_mock
     ):
         os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "3"
         command_wrapper_mock.return_value = None
@@ -67,27 +64,48 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         operator.bitwarden_signin(self.logger)
 
         self.assertEqual(operator.auth_failures, 1)
-        unlock_bw_mock.assert_not_called()
         recover_auth_state_mock.assert_not_called()
 
     @patch("bitwardenCrdOperator.recover_auth_state")
-    @patch("bitwardenCrdOperator.unlock_bw")
     @patch("bitwardenCrdOperator.command_wrapper")
     def test_recovery_runs_after_threshold_and_resets_counter(
-        self, command_wrapper_mock, unlock_bw_mock, recover_auth_state_mock
+        self, command_wrapper_mock, recover_auth_state_mock
     ):
         os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "2"
         operator.auth_failures = 1
         command_wrapper_mock.side_effect = [
             None,
             {"success": True},
+            {"data": {"template": {"status": "locked"}}},
+            {"data": {"raw": "new-session"}},
         ]
 
         operator.bitwarden_signin(self.logger)
 
         recover_auth_state_mock.assert_called_once_with(self.logger)
         self.assertEqual(operator.auth_failures, 0)
-        self.assertEqual(unlock_bw_mock.call_count, 1)
+        self.assertEqual(os.environ.get("BW_SESSION"), "new-session")
+
+    @patch("bitwardenCrdOperator.sys.exit")
+    @patch("bitwardenCrdOperator.recover_auth_state")
+    @patch("bitwardenCrdOperator.command_wrapper")
+    def test_recovery_failure_exits_process(
+        self, command_wrapper_mock, recover_auth_state_mock, sys_exit_mock
+    ):
+        os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "1"
+        command_wrapper_mock.side_effect = [None, None]
+
+        operator.bitwarden_signin(self.logger)
+
+        recover_auth_state_mock.assert_called_once_with(self.logger)
+        sys_exit_mock.assert_called_once_with(1)
+
+    def test_invalid_threshold_uses_default_without_exception_control_flow(self):
+        os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "invalid"
+
+        threshold = operator._auth_failure_threshold(self.logger)
+
+        self.assertEqual(threshold, operator.AUTH_FAILURE_THRESHOLD)
 
     @patch("bitwardenCrdOperator.command_wrapper")
     def test_recover_auth_state_clears_session_and_cache_file(
@@ -110,14 +128,13 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
                 self.logger, "logout", use_success=False
             )
 
-    @patch(
-        "bitwardenCrdOperator.unlock_bw",
-        side_effect=BitwardenCommandException("unlock failed"),
-    )
-    @patch("bitwardenCrdOperator.command_wrapper", return_value={"success": True})
-    def test_unlock_error_counts_as_auth_failure(
-        self, _command_wrapper_mock, _unlock_bw_mock
-    ):
+    @patch("bitwardenCrdOperator.command_wrapper")
+    def test_status_failure_counts_as_auth_failure(self, command_wrapper_mock):
+        command_wrapper_mock.side_effect = [
+            {"success": True},
+            None,
+        ]
+
         operator.bitwarden_signin(self.logger)
 
         self.assertEqual(operator.auth_failures, 1)

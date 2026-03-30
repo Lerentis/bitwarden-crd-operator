@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import os
+import sys
 import kopf
 import schedule
 import time
 import threading
 
-from utils.utils import BitwardenCommandException, command_wrapper, unlock_bw, sync_bw
+from utils.utils import command_wrapper, sync_bw
 
 
 AUTH_FAILURE_THRESHOLD = 3
@@ -46,16 +47,44 @@ def _auth_failure_threshold(logger):
     configured_threshold = os.environ.get(
         "BW_AUTH_FAILURE_THRESHOLD", str(AUTH_FAILURE_THRESHOLD)
     )
-    try:
-        threshold = int(configured_threshold)
-        if threshold < 1:
-            raise ValueError("BW_AUTH_FAILURE_THRESHOLD must be greater than 0")
-        return threshold
-    except ValueError:
-        logger.warn(
-            f"Invalid BW_AUTH_FAILURE_THRESHOLD '{configured_threshold}', using {AUTH_FAILURE_THRESHOLD}"
-        )
-        return AUTH_FAILURE_THRESHOLD
+    normalized_threshold = configured_threshold.strip()
+    if normalized_threshold.isdecimal():
+        threshold = int(normalized_threshold)
+        if threshold > 0:
+            return threshold
+
+    logger.warn(
+        f"Invalid BW_AUTH_FAILURE_THRESHOLD '{configured_threshold}', using {AUTH_FAILURE_THRESHOLD}"
+    )
+    return AUTH_FAILURE_THRESHOLD
+
+
+def _login_and_unlock(logger):
+    login_result = command_wrapper(logger, "login --apikey")
+    if login_result is None:
+        return False, "bw login failed"
+
+    status_output = command_wrapper(logger, "status", False)
+    if status_output is None or not isinstance(status_output, dict):
+        return False, "Failed to get bw status"
+
+    status = status_output.get("data", {}).get("template", {}).get("status")
+    if status == "unlocked":
+        if "DEBUG" in dict(os.environ):
+            logger.info("Already unlocked")
+        return True, ""
+
+    token_output = command_wrapper(logger, "unlock --passwordenv BW_PASSWORD")
+    if token_output is None or not isinstance(token_output, dict):
+        return False, "Failed to unlock vault"
+
+    token = token_output.get("data", {}).get("raw")
+    if token is None:
+        return False, "Failed to read session token"
+
+    os.environ["BW_SESSION"] = token
+    logger.info("Signin successful. Session exported")
+    return True, ""
 
 
 def recover_auth_state(logger):
@@ -72,30 +101,23 @@ def recover_auth_state(logger):
             logger.warn(f"Could not remove Bitwarden CLI cache file: {exc}")
 
 
-def _login_and_unlock(logger):
-    login_result = command_wrapper(logger, "login --apikey")
-    if login_result is None:
-        raise BitwardenCommandException("bw login failed")
-    unlock_bw(logger)
-
-
 def bitwarden_signin(logger, **kwargs):
     global auth_failures
 
     _configure_bw_host(logger)
     failure_threshold = _auth_failure_threshold(logger)
 
-    try:
-        _login_and_unlock(logger)
+    signin_ok, signin_error = _login_and_unlock(logger)
+    if signin_ok:
         if auth_failures > 0:
             logger.info("Authentication recovered")
         auth_failures = 0
         return
-    except BitwardenCommandException as exc:
-        auth_failures += 1
-        logger.error(
-            f"Authentication failed ({auth_failures}/{failure_threshold}): {exc}"
-        )
+
+    auth_failures += 1
+    logger.error(
+        f"Authentication failed ({auth_failures}/{failure_threshold}): {signin_error}"
+    )
 
     if auth_failures < failure_threshold:
         return
@@ -105,18 +127,22 @@ def bitwarden_signin(logger, **kwargs):
     )
     recover_auth_state(logger)
 
-    try:
-        _login_and_unlock(logger)
+    recovery_ok, recovery_error = _login_and_unlock(logger)
+    if recovery_ok:
         auth_failures = 0
         logger.info("Authentication recovery succeeded")
-    except BitwardenCommandException as exc:
-        logger.error(f"Authentication recovery failed: {exc}")
+        return
+
+    logger.error(f"Authentication recovery failed: {recovery_error}")
+    logger.error("Stopping operator process after failed authentication recovery")
+    sys.exit(1)
 
 
 def run_continuously(interval=30):
     cease_continuous_run = threading.Event()
 
     class ScheduleThread(threading.Thread):
+        @classmethod
         def run(self):
             while not cease_continuous_run.is_set():
                 schedule.run_pending()
