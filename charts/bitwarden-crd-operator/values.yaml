@@ -31,6 +31,8 @@ deploymentStrategy: "Recreate"
 #     value: "define_id"
 ##  - name: BW_RELOGIN_INTERVAL
 ##    value: "3600"
+##  - name: BW_AUTH_FAILURE_THRESHOLD
+##    value: "3"
 
 externalConfigSecret:
   enabled: false

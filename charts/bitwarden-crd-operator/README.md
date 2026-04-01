@@ -27,6 +27,9 @@ env:
     value: "YoUrCliEntSecRet"
   - name: BW_PASSWORD
     value: "YourSuperSecurePassword"
+  # Optional: recover after repeated auth failures
+  - name: BW_AUTH_FAILURE_THRESHOLD
+    value: "3"
 ```
 
 you can also create a secret manually with these information and reference the existing secret like this in the `values.yaml`:
