@@ -86,11 +86,11 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         self.assertEqual(operator.auth_failures, 0)
         self.assertEqual(os.environ.get("BW_SESSION"), "new-session")
 
-    @patch("bitwardenCrdOperator.sys.exit")
+    @patch("bitwardenCrdOperator.os._exit")
     @patch("bitwardenCrdOperator.recover_auth_state")
     @patch("bitwardenCrdOperator.command_wrapper")
     def test_recovery_failure_exits_process(
-        self, command_wrapper_mock, recover_auth_state_mock, sys_exit_mock
+        self, command_wrapper_mock, recover_auth_state_mock, os_exit_mock
     ):
         os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "1"
         command_wrapper_mock.side_effect = [None, None]
@@ -98,7 +98,7 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         operator.bitwarden_signin(self.logger)
 
         recover_auth_state_mock.assert_called_once_with(self.logger)
-        sys_exit_mock.assert_called_once_with(1)
+        os_exit_mock.assert_called_once_with(1)
 
     def test_invalid_threshold_uses_default_without_exception_control_flow(self):
         os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "invalid"
@@ -108,13 +108,16 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         self.assertEqual(threshold, operator.AUTH_FAILURE_THRESHOLD)
 
     @patch("bitwardenCrdOperator.command_wrapper")
-    def test_recover_auth_state_clears_session_and_cache_file(
+    def test_recover_auth_state_clears_session_cache_and_bw_host_marker(
         self, command_wrapper_mock
     ):
         with tempfile.TemporaryDirectory() as temp_dir:
             data_file = Path(temp_dir) / ".config" / "Bitwarden CLI" / "data.json"
             data_file.parent.mkdir(parents=True, exist_ok=True)
             data_file.write_text("{ invalid", encoding="utf-8")
+
+            bw_host_file = Path(temp_dir) / ".bw_host"
+            bw_host_file.write_text("https://vault.example.com", encoding="utf-8")
             os.environ["BW_SESSION"] = "stale-session"
 
             with patch(
@@ -124,6 +127,7 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
 
             self.assertNotIn("BW_SESSION", os.environ)
             self.assertFalse(data_file.exists())
+            self.assertFalse(bw_host_file.exists())
             command_wrapper_mock.assert_called_once_with(
                 self.logger, "logout", use_success=False
             )
