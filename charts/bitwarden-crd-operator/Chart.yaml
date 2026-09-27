@@ -4,9 +4,9 @@ description: Deploy the Bitwarden CRD Operator
 
 type: application
 
-version: "v0.18.0"
+version: "v0.18.1"
 
-appVersion: "0.17.0"
+appVersion: "0.18.0"
 
 keywords:
   - operator
@@ -128,6 +128,8 @@ annotations:
       description: "updated kopf to 1.44.6"
     - kind: changed
       description: "updated kubernetes to 36.0.3"
+    - kind: fixed
+      description: "fixed termination of operator process after failed authentication recovery"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
-      image: ghcr.io/lerentis/bitwarden-crd-operator:0.17.0
+      image: ghcr.io/lerentis/bitwarden-crd-operator:0.18.0
