@@ -108,13 +108,16 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         self.assertEqual(threshold, operator.AUTH_FAILURE_THRESHOLD)
 
     @patch("bitwardenCrdOperator.command_wrapper")
-    def test_recover_auth_state_clears_session_and_cache_file(
+    def test_recover_auth_state_clears_session_cache_and_bw_host_marker(
         self, command_wrapper_mock
     ):
         with tempfile.TemporaryDirectory() as temp_dir:
             data_file = Path(temp_dir) / ".config" / "Bitwarden CLI" / "data.json"
             data_file.parent.mkdir(parents=True, exist_ok=True)
             data_file.write_text("{ invalid", encoding="utf-8")
+
+            bw_host_file = Path(temp_dir) / ".bw_host"
+            bw_host_file.write_text("https://vault.example.com", encoding="utf-8")
             os.environ["BW_SESSION"] = "stale-session"
 
             with patch(
@@ -124,6 +127,7 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
 
             self.assertNotIn("BW_SESSION", os.environ)
             self.assertFalse(data_file.exists())
+            self.assertFalse(bw_host_file.exists())
             command_wrapper_mock.assert_called_once_with(
                 self.logger, "logout", use_success=False
             )

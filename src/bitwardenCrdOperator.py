@@ -92,6 +92,15 @@ def recover_auth_state(logger):
     command_wrapper(logger, "logout", use_success=False)
 
     home_dir = os.path.expanduser("~")
+
+    bw_host_file = os.path.join(home_dir, ".bw_host")
+    if os.path.isfile(bw_host_file):
+        try:
+            os.remove(bw_host_file)
+            logger.warn("Removed Bitwarden CLI host marker to recover auth state")
+        except OSError as exc:
+            logger.warn(f"Could not remove Bitwarden CLI host marker: {exc}")
+
     cli_data_file = os.path.join(home_dir, ".config", "Bitwarden CLI", "data.json")
     if os.path.isfile(cli_data_file):
         try:
@@ -126,6 +135,7 @@ def bitwarden_signin(logger, **kwargs):
         "Authentication failure threshold reached, recovering Bitwarden auth state"
     )
     recover_auth_state(logger)
+    _configure_bw_host(logger)
 
     recovery_ok, recovery_error = _login_and_unlock(logger)
     if recovery_ok:

@@ -1,9 +1,17 @@
 import os
 import json
 import subprocess
-import distutils
 import kubernetes
 import kopf
+
+
+def _strtobool(value):
+    normalized = str(value).strip().lower()
+    if normalized in {"y", "yes", "1", "true", "on"}:
+        return 1
+    if normalized in {"n", "no", "0", "false", "off", ""}:
+        return 0
+    raise ValueError(f"invalid truth value {value!r}")
 
 bw_sync_interval = float(os.environ.get(
     'BW_SYNC_INTERVAL', 900))
@@ -30,7 +38,7 @@ def sync_bw(logger, force=False):
             logger.info("Running with regular force sync enabled")
         return
 
-    global_force_sync = bool(distutils.util.strtobool(
+    global_force_sync = bool(_strtobool(
         os.environ.get('BW_FORCE_SYNC', "false")))
 
     if global_force_sync:
