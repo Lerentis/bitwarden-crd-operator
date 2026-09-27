@@ -112,8 +112,22 @@ annotations:
   artifacthub.io/operator: "true"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |
-    - kind: added
-      description: "Added self heal mechanism on vault unlock issues"
+    - kind: changed
+      description: "updated alpine to 3.24.2"
+    - kind: changed
+      description: "updated python to 3.14.7"
+    - kind: changed
+      description: "updated pip to 26.1.2"
+    - kind: changed
+      description: "updated libcrypto3 to 3.5.8"
+    - kind: changed
+      description: "updated nodejs to 24.18.1"
+    - kind: fixed
+      description: "fixed auth recovery to reconfigure the bitwarden host instead of falling back to a default"
+    - kind: changed
+      description: "updated kopf to 1.44.6"
+    - kind: changed
+      description: "updated kubernetes to 36.0.3"
   artifacthub.io/images: |
     - name: bitwarden-crd-operator
       image: ghcr.io/lerentis/bitwarden-crd-operator:0.17.0

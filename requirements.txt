@@ -1,4 +1,4 @@
-kopf==1.44.4
-kubernetes==35.0.0
+kopf==1.44.6
+kubernetes==36.0.3
 Jinja2==3.1.6
 schedule==1.2.2
