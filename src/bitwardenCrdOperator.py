@@ -145,7 +145,7 @@ def bitwarden_signin(logger, **kwargs):
 
     logger.error(f"Authentication recovery failed: {recovery_error}")
     logger.error("Stopping operator process after failed authentication recovery")
-    sys.exit(1)
+    os._exit(1)
 
 
 def run_continuously(interval=30):

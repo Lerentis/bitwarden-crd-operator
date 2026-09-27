@@ -86,11 +86,11 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         self.assertEqual(operator.auth_failures, 0)
         self.assertEqual(os.environ.get("BW_SESSION"), "new-session")
 
-    @patch("bitwardenCrdOperator.sys.exit")
+    @patch("bitwardenCrdOperator.os._exit")
     @patch("bitwardenCrdOperator.recover_auth_state")
     @patch("bitwardenCrdOperator.command_wrapper")
     def test_recovery_failure_exits_process(
-        self, command_wrapper_mock, recover_auth_state_mock, sys_exit_mock
+        self, command_wrapper_mock, recover_auth_state_mock, os_exit_mock
     ):
         os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "1"
         command_wrapper_mock.side_effect = [None, None]
@@ -98,7 +98,7 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         operator.bitwarden_signin(self.logger)
 
         recover_auth_state_mock.assert_called_once_with(self.logger)
-        sys_exit_mock.assert_called_once_with(1)
+        os_exit_mock.assert_called_once_with(1)
 
     def test_invalid_threshold_uses_default_without_exception_control_flow(self):
         os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "invalid"
