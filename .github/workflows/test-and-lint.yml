@@ -16,6 +16,14 @@ jobs:
         with:
           version: v3.11.2
 
+      - name: Validate Helm values schema
+        run: |
+          helm template schema-validation charts/bitwarden-crd-operator >/dev/null
+          if helm template schema-validation charts/bitwarden-crd-operator --set image.pullPolicy=invalid >/dev/null 2>&1; then
+            echo "Expected invalid image.pullPolicy to fail schema validation"
+            exit 1
+          fi
+
       - uses: actions/setup-python@v6
         with:
           python-version: '3.9'
@@ -38,7 +46,7 @@ jobs:
 
       - name: Install ah cli
         run: |
-          export AH_VERSION=1.17.0
+          export AH_VERSION=1.23.0
           curl -LO https://github.com/artifacthub/hub/releases/download/v${AH_VERSION}/ah_${AH_VERSION}_linux_amd64.tar.gz
           tar -xf ah_${AH_VERSION}_linux_amd64.tar.gz
           chmod +x ./ah
