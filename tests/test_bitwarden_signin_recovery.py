@@ -45,13 +45,31 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
     def test_signin_success_resets_failure_counter(self, command_wrapper_mock):
         operator.auth_failures = 2
         command_wrapper_mock.side_effect = [
-            {"success": True},
-            {"data": {"template": {"status": "unlocked"}}},
+            {"data": {"template": {"status": "locked"}}},
+            {"data": {"raw": "new-session"}},
         ]
 
         operator.bitwarden_signin(self.logger)
 
         self.assertEqual(operator.auth_failures, 0)
+        self.assertEqual(os.environ.get("BW_SESSION"), "new-session")
+        self.assertEqual(
+            [call.args[1] for call in command_wrapper_mock.call_args_list],
+            ["status", "unlock --passwordenv BW_PASSWORD"],
+        )
+
+    @patch("bitwardenCrdOperator.command_wrapper")
+    def test_unlocked_session_skips_api_login(self, command_wrapper_mock):
+        command_wrapper_mock.return_value = {
+            "data": {"template": {"status": "unlocked"}}
+        }
+
+        operator.bitwarden_signin(self.logger)
+
+        self.assertEqual(operator.auth_failures, 0)
+        command_wrapper_mock.assert_called_once_with(
+            self.logger, "status", False
+        )
 
     @patch("bitwardenCrdOperator.recover_auth_state")
     @patch("bitwardenCrdOperator.command_wrapper")
@@ -75,6 +93,8 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         operator.auth_failures = 1
         command_wrapper_mock.side_effect = [
             None,
+            None,
+            None,
             {"success": True},
             {"data": {"template": {"status": "locked"}}},
             {"data": {"raw": "new-session"}},
@@ -93,7 +113,7 @@ class BitwardenSigninRecoveryTests(unittest.TestCase):
         self, command_wrapper_mock, recover_auth_state_mock, os_exit_mock
     ):
         os.environ["BW_AUTH_FAILURE_THRESHOLD"] = "1"
-        command_wrapper_mock.side_effect = [None, None]
+        command_wrapper_mock.side_effect = [None, None, None, None]
 
         operator.bitwarden_signin(self.logger)
 

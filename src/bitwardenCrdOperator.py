@@ -60,15 +60,22 @@ def _auth_failure_threshold(logger):
 
 
 def _login_and_unlock(logger):
-    login_result = command_wrapper(logger, "login --apikey")
-    if login_result is None:
-        return False, "bw login failed"
-
     status_output = command_wrapper(logger, "status", False)
-    if status_output is None or not isinstance(status_output, dict):
-        return False, "Failed to get bw status"
+    status = None
+    if isinstance(status_output, dict):
+        status = status_output.get("data", {}).get("template", {}).get("status")
 
-    status = status_output.get("data", {}).get("template", {}).get("status")
+    if status not in ("locked", "unlocked"):
+        login_result = command_wrapper(logger, "login --apikey")
+        if login_result is None:
+            return False, "bw login failed"
+
+        status_output = command_wrapper(logger, "status", False)
+        if status_output is None or not isinstance(status_output, dict):
+            return False, "Failed to get bw status"
+
+        status = status_output.get("data", {}).get("template", {}).get("status")
+
     if status == "unlocked":
         if "DEBUG" in dict(os.environ):
             logger.info("Already unlocked")
