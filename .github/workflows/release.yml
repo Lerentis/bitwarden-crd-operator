@@ -79,7 +79,7 @@ jobs:
           cmd: yq '.version' charts/bitwarden-crd-operator/Chart.yaml
 
       - name: Download SBOM from github action
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.ANCHORE_SBOM_ACTION_PRIOR_ARTIFACT }}
 
