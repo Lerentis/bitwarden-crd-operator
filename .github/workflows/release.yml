@@ -36,13 +36,13 @@ jobs:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Get app version from chart
-        uses: mikefarah/yq@v4.50.1
+        uses: mikefarah/yq@v4.52.4
         id: app_version
         with:
           cmd: yq '.appVersion' charts/bitwarden-crd-operator/Chart.yaml
 
       - name: "GHCR Login"
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: lerentis
@@ -52,7 +52,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
       
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: "GHCR Build and Push"
         id: docker_build
@@ -73,13 +73,13 @@ jobs:
           sbom-artifact-match: ".*\\.spdx\\.json"
 
       - name: Get chart version
-        uses: mikefarah/yq@v4.50.1
+        uses: mikefarah/yq@v4.52.4
         id: chart_version
         with:
           cmd: yq '.version' charts/bitwarden-crd-operator/Chart.yaml
 
       - name: Download SBOM from github action
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.ANCHORE_SBOM_ACTION_PRIOR_ARTIFACT }}
 
